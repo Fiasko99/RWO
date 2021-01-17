@@ -36,12 +36,12 @@ namespace RWO
             this.PreviousPage = new System.Windows.Forms.Button();
             this.NextPage = new System.Windows.Forms.Button();
             this.NumberPage = new System.Windows.Forms.Label();
-            this.SortWritters = new System.Windows.Forms.ComboBox();
             this.FirstPage = new System.Windows.Forms.Button();
             this.LastPage = new System.Windows.Forms.Button();
             this.WrittersOnList = new System.Windows.Forms.ComboBox();
             this.InfoLabel = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.GetReport = new System.Windows.Forms.Button();
+            this.FormatReport = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // WrittersListView
@@ -63,7 +63,6 @@ namespace RWO
             this.WrittersListView.View = System.Windows.Forms.View.Details;
             this.WrittersListView.DrawColumnHeader += new System.Windows.Forms.DrawListViewColumnHeaderEventHandler(this.WrittersListView_DrawColumnHeader);
             this.WrittersListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.WrittersListView_DrawItem);
-            this.WrittersListView.DoubleClick += new System.EventHandler(this.WrittersListView_DoubleClick);
             this.WrittersListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.WrittersListView_MouseDoubleClick);
             // 
             // NameWritter
@@ -111,19 +110,6 @@ namespace RWO
             this.NumberPage.Text = "1";
             this.NumberPage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // SortWritters
-            // 
-            this.SortWritters.FormattingEnabled = true;
-            this.SortWritters.Items.AddRange(new object[] {
-            "По имени",
-            "По имени книги",
-            "По стажу"});
-            this.SortWritters.Location = new System.Drawing.Point(559, 14);
-            this.SortWritters.Name = "SortWritters";
-            this.SortWritters.Size = new System.Drawing.Size(108, 21);
-            this.SortWritters.TabIndex = 4;
-            this.SortWritters.Text = "Сортировка";
-            // 
             // FirstPage
             // 
             this.FirstPage.Location = new System.Drawing.Point(108, 12);
@@ -169,30 +155,43 @@ namespace RWO
             this.InfoLabel.TabIndex = 8;
             this.InfoLabel.Text = "Писателей на странице";
             // 
-            // comboBox1
+            // GetReport
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "По имени",
-            "По имени книги",
-            "По стажу"});
-            this.comboBox1.Location = new System.Drawing.Point(673, 14);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(115, 21);
-            this.comboBox1.TabIndex = 9;
-            this.comboBox1.Text = "Сортировка";
+            this.GetReport.Enabled = false;
+            this.GetReport.Location = new System.Drawing.Point(716, 14);
+            this.GetReport.Name = "GetReport";
+            this.GetReport.Size = new System.Drawing.Size(72, 21);
+            this.GetReport.TabIndex = 9;
+            this.GetReport.Text = "Отчёт";
+            this.GetReport.UseVisualStyleBackColor = true;
+            this.GetReport.Click += new System.EventHandler(this.GetReport_Click);
+            // 
+            // FormatReport
+            // 
+            this.FormatReport.FormattingEnabled = true;
+            this.FormatReport.Items.AddRange(new object[] {
+            "CSV UTF-8 (разделитель - точка с запятой)|*.csv",
+            "CSV UTF-8 (разделитель - запятая)|*.csv",
+            "CSV UTF-8 (разделитель - слэш)|*.csv",
+            "Язык разметки XML|*.xml"});
+            this.FormatReport.Location = new System.Drawing.Point(559, 14);
+            this.FormatReport.Name = "FormatReport";
+            this.FormatReport.Size = new System.Drawing.Size(151, 21);
+            this.FormatReport.TabIndex = 10;
+            this.FormatReport.Text = "Выберите формат отчета";
+            this.FormatReport.SelectedIndexChanged += new System.EventHandler(this.FormatReport_SelectedIndexChanged);
             // 
             // WrittersListForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.FormatReport);
+            this.Controls.Add(this.GetReport);
             this.Controls.Add(this.InfoLabel);
             this.Controls.Add(this.WrittersOnList);
             this.Controls.Add(this.LastPage);
             this.Controls.Add(this.FirstPage);
-            this.Controls.Add(this.SortWritters);
             this.Controls.Add(this.NumberPage);
             this.Controls.Add(this.NextPage);
             this.Controls.Add(this.PreviousPage);
@@ -214,11 +213,11 @@ namespace RWO
         private System.Windows.Forms.Button PreviousPage;
         private System.Windows.Forms.Button NextPage;
         private System.Windows.Forms.Label NumberPage;
-        private System.Windows.Forms.ComboBox SortWritters;
         private System.Windows.Forms.Button FirstPage;
         private System.Windows.Forms.Button LastPage;
         private System.Windows.Forms.ComboBox WrittersOnList;
         private System.Windows.Forms.Label InfoLabel;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button GetReport;
+        private System.Windows.Forms.ComboBox FormatReport;
     }
 }

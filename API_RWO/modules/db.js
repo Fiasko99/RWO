@@ -199,10 +199,45 @@ let rating = {
   }
 }
 
+let admins = {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false
+  },
+  login: {
+    type: Sequelize.STRING(32),
+    allowNull: false
+  },
+  password: {
+    type: Sequelize.STRING(32),
+    allowNull: false
+  }
+}
+
+let reports = {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false
+  },
+  login: {
+    type: Sequelize.STRING(32),
+    allowNull: false
+  },
+  link_file: {
+    type: Sequelize.TEXT,
+    allowNull: false
+  }
+}
+
 module.exports = {
   languages, genres,
   compositions, rating,
   age_limits, readers,
   offers, writters,
-  sponsorship
+  sponsorship, reports
 }
+

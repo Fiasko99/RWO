@@ -26,6 +26,7 @@
     "mysql2": "^2.2.5",
     "nodemailer": "^6.4.17",
     "sequelize": "^6.3.5",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "xmlbuilder": "^15.1.1"
   }
 }

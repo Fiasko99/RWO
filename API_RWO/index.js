@@ -18,7 +18,7 @@ const {
   offers, writters,
   sponsorship,
   languages,
-  genres
+  genres, reports
 } = require('./modules/db')
 let PORT = process.env.PORT || 3001;
 let uri = `http://176.100.0.104:${PORT}`
@@ -37,11 +37,13 @@ app.use(bodyParser.json())
 // Парсинг запросов по типу: application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('app'))
+app.use('/static/reports', express.static('Reports'))
 // Покдлючение к базе данных
 const sequelize = conSeq()
 
 // Стэк модулей для базы данных
 const Languages = sequelize.define('languages', languages)
+const Reports = sequelize.define('reports', reports)
 const Genres = sequelize.define('genres', genres)
 const Readers = sequelize.define('readers', readers)
 const Writters = sequelize.define('writters', writters)
@@ -57,7 +59,35 @@ writeToFileLog('Сервер стартовал в ' + new Date() + '\n\n')
 
 // Запросы
 app.get('/', (req, res) => {
-  res.send('<a href="http://176.100.0.104:3001/Debug.rar" targer="_blank">Скачать файл</a>')
+  return res.send('<a href="http://176.100.0.104:3001/Debug.rar" targer="_blank">Скачать файл</a>')
+})
+
+app.get('/api/report/create/writters/:id/:role', async (req, res) => {
+  let queryUser;
+  if (req.params.role == 'Инвестор') {
+    queryUser = await Offers.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  }
+  let writters = await Writters.findAll({})
+  let path = createReportFile(writters, queryUser, 'Писатели')
+  await Reports.create({
+    login: queryUser.login,
+    link_file: `${uri}/static/reports/${path}`,
+  }).catch(() => {
+    return res.send('Ошибка базы данных')
+  })
+  writeToFileLog(`
+                  Пользователь 
+                  id: ${queryUser.id}
+                  Инициалы: ${queryUser.surname} ${queryUser.name} 
+                  запросил отчёт писателей на клиенте в ${new Date()}
+                `)
+  
 })
 
 app.post('/api/login', async (req, res) => {
@@ -120,6 +150,12 @@ app.get('/api/confirm/:role/:id', async (req, res) => {
   }
   user.confirm = true
   user.save()
+  writeToFileLog(`
+                  Пользователь 
+                  id: ${user.id}
+                  Инициалы: ${user.surname} ${user.name} 
+                  запросил подтверждение регистрации в ${new Date()}
+                `)
   return res.sendFile(__dirname + '/index.html')
 })
 
@@ -213,7 +249,6 @@ app.post('/api/registration', async (req, res) => {
 
 app.get('/api/books/:id/:role', async (req, res) => {
   let queryUser;
-  console.log(req.params.role)
   if (req.params.role == 'Инвестор') {
     queryUser = await Offers.findOne({
       where: {
@@ -299,7 +334,6 @@ app.get('/api/books/:id/:role', async (req, res) => {
     newFormBooks.push(newFormBook)
   }
   if(newFormBooks.length > 0) {
-    console.log(newFormBooks)
     return res.end(
       JSON.stringify(newFormBooks)
     )
@@ -309,7 +343,6 @@ app.get('/api/books/:id/:role', async (req, res) => {
 
 app.get('/api/writters/list/:id/:role', async (req, res) => {
   let queryUser;
-  console.log(req.params.role)
   if (req.params.role == 'Инвестор') {
     queryUser = await Offers.findOne({
       where: {
@@ -356,7 +389,6 @@ app.get('/api/writters/list/:id/:role', async (req, res) => {
 
 app.get('/api/text/book/:id/:iduser/:role', async (req, res) => {
   let queryUser;
-  console.log(req.params.role)
   if (req.params.role == 'Инвестор') {
     queryUser = await Offers.findOne({
       where: {
@@ -627,5 +659,36 @@ function writeToFileLog(text) {
   fs.appendFile(__dirname + '/Logs.txt', text + "\r\n\n", (err) => {
     console.log('Data add')
     if(err) throw err;
-  });
+  })
+}
+
+function createReportFile(listXML, user, nameList) {
+  let builder = require('xmlbuilder');
+  let doc = builder.create('root');
+    doc.ele('Отчёт')  
+  for (let item of listXML) {
+    doc
+      .ele(nameList)
+        .ele('Наименование')
+          .txt(item.name + ' ' + item.surname)
+          .up()
+        .ele('ДатаРегистрации')
+          .txt('' + item.createdAt)
+          .up()
+        .ele('email')
+          .txt(item.email)
+          .up()
+        .ele('login')
+          .txt(item.login)
+          .up()
+        .ele('Подтверждён')
+          .txt(item.confirm)
+          .up()
+  }
+  let path = `${v4()}USER=${user.name}.xml`
+  fs.appendFile(__dirname + `/Reports/${path}`, doc.toString({ pretty: true }), err => {
+    console.log('Xml add')
+    if(err) throw err;
+  })
+  return path
 }

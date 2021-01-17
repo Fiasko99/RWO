@@ -191,9 +191,15 @@ namespace RWO
             Hide();
         }
 
-        private void WrittersListView_DoubleClick(object sender, EventArgs e)
+        private void FormatReport_SelectedIndexChanged(object sender, EventArgs e)
         {
+            GetReport.Enabled = true;
+        }
 
+        private void GetReport_Click(object sender, EventArgs e)
+        {
+            DBConnection API = new DBConnection();
+            var answer = API.GetJSON($"/api/report/create/writters/{UserActive.id}/Инвестор");
         }
     }
     public class Writter
