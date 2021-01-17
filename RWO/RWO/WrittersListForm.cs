@@ -17,6 +17,7 @@ namespace RWO
         public int countbooksvalue;
         public List<Writter> writters;
         public User UserActive;
+        string UserInfo = null;
         public WrittersListForm(User NetworkUser)
         {
             InitializeComponent();
@@ -25,11 +26,22 @@ namespace RWO
 
         private void WrittersListForm_Load(object sender, EventArgs e)
         {
-            
+            if (UserActive is UserOffer offer)
+            {
+                UserInfo = UserActive.id + "/" + offer.role;
+            }
+            else if (UserActive is UserReader reader)
+            {
+                UserInfo = UserActive.id + "/" + reader.role;
+            }
+            else if (UserActive is UserWritter writter)
+            {
+                UserInfo = UserActive.id + "/" + writter.role;
+            }
             DBConnection API = new DBConnection();
             new Thread(() =>
             {
-                string writterslist = API.GetJSON("/api/writters/list");
+                string writterslist = API.GetJSON("/api/writters/list/" + UserInfo);
                 if (writterslist != null && API.ExceptionMessage == null)
                 {
                     writters = JsonSerializer.Deserialize<List<Writter>>(writterslist);

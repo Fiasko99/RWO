@@ -397,7 +397,6 @@ namespace RWO
                 }
                 return FilterList;
             }
-            return new List<Book>();
         }
 
         private void ComboGenres_SelectionChangeCommitted(object sender, EventArgs e)

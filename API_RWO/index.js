@@ -282,7 +282,7 @@ app.get('/api/books/:id/:role', async (req, res) => {
     })
     let genre = await Genres.findOne({
       where: {
-        id: book.genre
+        id: book.genre_id
       },
       attributes: [
         'name'
@@ -299,6 +299,7 @@ app.get('/api/books/:id/:role', async (req, res) => {
     newFormBooks.push(newFormBook)
   }
   if(newFormBooks.length > 0) {
+    console.log(newFormBooks)
     return res.end(
       JSON.stringify(newFormBooks)
     )
@@ -514,10 +515,10 @@ function associationsDB() {
       name: 'id',
       allowNull: false
     },
-    as: 'genres'
+    as: 'genre'
   })
   Genres.hasMany(Compositions, {
-    foreignKey: 'genres_id',
+    foreignKey: 'genre_id',
     as: 'compositions'
   })
 
