@@ -33,6 +33,24 @@ let readers = {
   },
   date_of_born: {
     type: Sequelize.DATEONLY
+  },
+  confirm: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
+  }
+}
+
+let genres = {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false
+  },
+  name: {
+    type: Sequelize.STRING(32),
+    allowNull: false
   }
 }
 
@@ -84,6 +102,11 @@ let writters = {
     type: Sequelize.INTEGER(2),
     allowNull: true
   },
+  confirm: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
+  }
 }
 
 let offers = {
@@ -121,6 +144,11 @@ let offers = {
     type: Sequelize.TEXT,
     allowNull: true
   },
+  confirm: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
+  }
 }
 
 let compositions = {
@@ -132,10 +160,6 @@ let compositions = {
   },
   name_composition: {
     type: Sequelize.STRING(128),
-    allowNull: false
-  },
-  genre: {
-    type: Sequelize.STRING(24),
     allowNull: false
   },
   text_composition: {
@@ -176,7 +200,7 @@ let rating = {
 }
 
 module.exports = {
-  languages,
+  languages, genres,
   compositions, rating,
   age_limits, readers,
   offers, writters,

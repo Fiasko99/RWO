@@ -17,7 +17,8 @@ const {
   age_limits, readers,
   offers, writters,
   sponsorship,
-  languages
+  languages,
+  genres
 } = require('./modules/db')
 let PORT = process.env.PORT || 3001;
 let uri = `http://176.100.0.104:${PORT}`
@@ -41,6 +42,7 @@ const sequelize = conSeq()
 
 // Стэк модулей для базы данных
 const Languages = sequelize.define('languages', languages)
+const Genres = sequelize.define('genres', genres)
 const Readers = sequelize.define('readers', readers)
 const Writters = sequelize.define('writters', writters)
 const Offers = sequelize.define('offers', offers)
@@ -51,12 +53,20 @@ const AgeLimits = sequelize.define('age_limits', age_limits)
 
 associationsDB()
 
+writeToFileLog('Сервер стартовал в ' + new Date() + '\n\n')
+
 // Запросы
 app.get('/', (req, res) => {
   res.send('<a href="http://176.100.0.104:3001/Debug.rar" targer="_blank">Скачать файл</a>')
 })
 
 app.post('/api/login', async (req, res) => {
+  writeToFileLog(`
+                  Пользователь 
+                  id: 
+                  Инициалы: ${req.body.Login} 
+                  запросил вход на клиенте в ${new Date()}
+                `)
   if (req.body.Role == 'Читатель') {
     let response = await checkReader(
       req.body.Login, req.body.Password
@@ -77,128 +87,173 @@ app.post('/api/login', async (req, res) => {
   }
   return res.end('not found')
 })
- // attr -> id_user && role
-let NotComfirmUsers = [
-  {
-    id_user: -1,
-    role: '-1'
-  }
-]
 
-app.get('/api/confirm/:id', (req, res) => {
-  if (NotComfirmUsers.findIndex(user => user.id == req.params.id)) {
-    NotComfirmUsers = NotComfirmUsers.filter(user => user.id_user != req.params.id)
-    console.log(NotComfirmUsers)
-    return res.sendFile(__dirname + '/index.html')
+
+app.get('/api/confirm/:role/:id', async (req, res) => {
+  let user
+  if (req.params.role == 'Инвестор') {
+    user = await Offers.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.send('Ошибка базы данных')
+    })
+  } else if (req.params.role == 'Читатель') {
+    user = await Readers.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.send('Ошибка базы данных')
+    })
+  } else if (req.params.role == 'Писатель') {
+    user = await Writters.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.send('Ошибка базы данных')
+    })
+  } else {
+    return res.send('Ссылка недействительна')
   }
+  user.confirm = true
+  user.save()
+  return res.sendFile(__dirname + '/index.html')
 })
 
 app.post('/api/registration', async (req, res) => {
-  console.log('some')
+  writeToFileLog(`
+                  Пользователь 
+                  id: ${req.body.Login}
+                  Инициалы: ${req.body.surname} ${req.body.name} 
+                  запросил регистрацию на клиенте в ${new Date()}
+                `)
   if (req.body.Role == 'Читатель') {
-    await Readers.create({
+    let user = await Readers.create({
       login: req.body.Login,
       password: req.body.Password,
       name: req.body.Name,
       surname: req.body.Surname,
       email: req.body.Email,
       secret_code: req.body.SecretCode,
-    }).then(async result => {
-      let reader = {
-        id_user: result.id,
-        role: 'reader'
-      }
-      NotComfirmUsers.push(reader)
-      let IsMail = await mailSend(
-        result.id,
-        uri,
-        result.email
-      )
-      if (IsMail) {
-        console.log(IsMail)
-        return res.end(
-          JSON.stringify(result)
-        )
-      }
-      return res.end('error mail')
     }).catch(() => {
       return res.end('error database')
     })
+    let IsMail = await mailSend(
+      user.id,
+      uri,
+      user.email,
+      req.body.Role
+    )
+    if (IsMail) {
+      return res.end(
+        JSON.stringify(user)
+      )
+    } else {
+      await user.destroy();
+      return res.end('error mail')
+    }
   }
   else if (req.body.Role == 'Писатель') {
-    await Writters.create({
+    let user = await Writters.create({
       login: req.body.Login,
       password: req.body.Password,
       name: req.body.Name,
       surname: req.body.Surname,
       email: req.body.Email,
       secret_code: req.body.SecretCode,
-    }).then(async result => {
-      let writter = {
-        id_user: result.id,
-        role: 'writter'
-      }
-      NotComfirmUsers.push(writter)
-      let IsMail = await mailSend(
-        result.id,
-        uri,
-        result.email
-      )
-      if (IsMail) {
-        console.log(IsMail)
-        return res.end(
-          JSON.stringify(result)
-        )
-      }
-      return res.end('error mail')
     }).catch(() => {
       return res.end('error database')
     })
+    let IsMail = await mailSend(
+      user.id,
+      uri,
+      user.email,
+      req.body.Role
+    )
+    if (IsMail) {
+      return res.end(
+        JSON.stringify(user)
+      )
+    } else {
+      await user.destroy();
+      return res.end('error mail')
+    }
   }
   else if (req.body.Role == 'Инвестор') {
-    await Offers.create({
+    let user = await Offers.create({
       login: req.body.Login,
       password: req.body.Password,
       name: req.body.Name,
       surname: req.body.Surname,
       email: req.body.Email,
       secret_code: req.body.SecretCode,
-    }).then(async result => {
-      let offer = {
-        id_user: result.id,
-        role: 'offer'
-      }
-      NotComfirmUsers.push(offer)
-      console.log(NotComfirmUsers)
-      let IsMail = await mailSend(
-        result.id,
-        uri,
-        result.email
-      )
-      if (IsMail) {
-        
-        return res.end(
-          JSON.stringify(result)
-        )
-      }
-      return res.end('error mail')
     }).catch(() => {
       return res.end('error database')
     })
+    let IsMail = await mailSend(
+      user.id,
+      uri,
+      user.email,
+      req.body.Role
+    )
+    if (IsMail) {
+      return res.end(
+        JSON.stringify(user)
+      )
+    } else {
+      await user.destroy();
+      return res.end('error mail')
+    }
   }
   return res.end('Fail registration')
 })
 
-app.get('/api/books', async (req, res) => {
+app.get('/api/books/:id/:role', async (req, res) => {
+  let queryUser;
+  console.log(req.params.role)
+  if (req.params.role == 'Инвестор') {
+    queryUser = await Offers.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  } else if (req.params.role == 'Читатель') {
+    queryUser = await Readers.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  } else if (req.params.role == 'Писатель') {
+    queryUser = await Writters.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  }
+  writeToFileLog(`
+                  Пользователь 
+                  id: ${queryUser.id}
+                  Инициалы: ${queryUser.surname} ${queryUser.name} 
+                  запросил список книг на клиенте в ${new Date()}
+                `)
   let newFormBooks = []
   let books = await Compositions.findAll({
     attributes: [
       'id', 'name_composition', 
-      'genre', 'age_limit_id',
+      'genre_id', 'age_limit_id',
       'writter_id', 'language_id'
     ]
   }).catch(() => {
-    return res.end('Fail')
+    return res.end('Fail database')
   })
   for (let book of books) {
     let writter = await Writters.findOne({
@@ -225,10 +280,18 @@ app.get('/api/books', async (req, res) => {
         'name'
       ]
     })
+    let genre = await Genres.findOne({
+      where: {
+        id: book.genre
+      },
+      attributes: [
+        'name'
+      ]
+    })
     let newFormBook = {
       id: book.id,
       name_composition: book.name_composition,
-      genre: book.genre,
+      genre: genre.name,
       writter_name: writter.name + " " + writter.surname,
       age_limit_value: age_limit.value.toString(),
       language: language.name
@@ -243,7 +306,40 @@ app.get('/api/books', async (req, res) => {
   return res.end('not found')
 })
 
-app.get('/api/writters/list', async (req, res) => {
+app.get('/api/writters/list/:id/:role', async (req, res) => {
+  let queryUser;
+  console.log(req.params.role)
+  if (req.params.role == 'Инвестор') {
+    queryUser = await Offers.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  } else if (req.params.role == 'Читатель') {
+    queryUser = await Readers.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  } else if (req.params.role == 'Писатель') {
+    queryUser = await Writters.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  }
+  writeToFileLog(`
+                  Пользователь 
+                  id: ${queryUser.id}
+                  Инициалы: ${queryUser.surname} ${queryUser.name} 
+                  запросил список писателей на клиенте ${new Date()}
+                `)
   await Writters.findAll({
     attributes: [
       'id',
@@ -257,7 +353,40 @@ app.get('/api/writters/list', async (req, res) => {
   })
 })
 
-app.get('/api/text/book/:id', async (req, res) => {
+app.get('/api/text/book/:id/:iduser/:role', async (req, res) => {
+  let queryUser;
+  console.log(req.params.role)
+  if (req.params.role == 'Инвестор') {
+    queryUser = await Offers.findOne({
+      where: {
+        id: req.params.iduser
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  } else if (req.params.role == 'Читатель') {
+    queryUser = await Readers.findOne({
+      where: {
+        id: req.params.iduser
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  } else if (req.params.role == 'Писатель') {
+    queryUser = await Writters.findOne({
+      where: {
+        id: req.params.iduser
+      }
+    }).catch(() => {
+      return res.end('Fail database')
+    })
+  }
+  writeToFileLog(`
+                  Пользователь 
+                  id: ${queryUser.id}
+                  Инициалы: ${queryUser.surname} ${queryUser.name} 
+                  запросил книгу на клиенте в ${new Date()}
+                `)
   await Compositions.findOne({
     where: {
       id: req.params.id
@@ -291,15 +420,17 @@ async function checkReader(login, password) {
     attributes: [
       'id', 'name',
       'surname', 'email',
-      'date_of_born'
+      'date_of_born', 'confirm'
     ]
   }).catch(() => {
     return 'error'
   })
   if (user) {
-    if (!NotComfirmUsers.findIndex(x => x.id_user == user.id) > 0)
-      return 'u r blocked'
-    return user
+    if (user.confirm != 0) {
+      user.confirm = undefined
+      return user
+    }
+    return 'not confirm'
   }
   return 'not found'
 }
@@ -313,15 +444,17 @@ async function checkWriter(login, password) {
     attributes: [
       'id', 'name',
       'surname', 'email',
-      'work_experience'
+      'work_experience', 'confirm'
     ]
   }).catch(() => {
     return 'error'
   })
   if (user) {
-    if (!NotComfirmUsers.findIndex(x => x.id_user == user.id))
-      return 'u r blocked'
-    return user
+    if (user.confirm != 0) {
+      user.confirm = undefined
+      return user
+    }
+    return 'not confirm'
   }
   return 'not found'
 }
@@ -335,17 +468,17 @@ async function checkOffer(login, password) {
     attributes: [
       'id', 'name',
       'surname', 'email',
-      'note'
+      'note', 'confirm'
     ]
   }).catch(() => {
-    console.log('error')
     return 'error'
   })
   if (user) {
-    console.log(!NotComfirmUsers.findIndex(x => x.id_user != user.id))
-    if (!NotComfirmUsers.findIndex(x => x.id_user != user.id))
+    if (user.confirm != 0) {
+      user.confirm = undefined
       return user
-    return 'u r blocked'
+    }
+    return 'not confirm'
   }
   return 'not found'
 }
@@ -373,6 +506,18 @@ function associationsDB() {
   })
   Languages.hasMany(Compositions, {
     foreignKey: 'language_id',
+    as: 'compositions'
+  })
+
+  Compositions.belongsTo(Genres, {
+    foreignKey: {
+      name: 'id',
+      allowNull: false
+    },
+    as: 'genres'
+  })
+  Genres.hasMany(Compositions, {
+    foreignKey: 'genres_id',
     as: 'compositions'
   })
 
@@ -435,17 +580,8 @@ function associationsDB() {
   })
 }
 
-async function validateWriter(login, password) {
-  let user = await Writters.findOne({
-    where: {
-      login_writer: login,
-      password_writer: password
-    }
-  })
-  return user
-}
-
-async function mailSend(id, uri, mail) {
+// отправка письма подтверждения профиля
+async function mailSend(id, uri, mail, role) {
   // Generate test SMTP service account from ethereal.email
   // Only needed if you don't have a real mail account for testing
   // let testAccount = await nodemailer.createTestAccount();
@@ -469,21 +605,26 @@ async function mailSend(id, uri, mail) {
       to: mail, // list of receivers
       subject: "Hello, u r confirm ur profile ✔", // Subject line
       // text: ``, // plain text body
-      html: `<a href="${uri}/api/confirm/${id}">Click for open app</a>`, // html body
+      html: `<a href="${uri}/api/confirm/${role}/${id}">Click for open app</a>`, // html body
     })
   } catch (error) {
     return false
   }
  
 
-  console.log("Message sent: %s", info.messageId);
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
   // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
   // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
   if (info.messageId) {
     return true
   }
   return false
+}
+
+// Ведение журнала
+function writeToFileLog(text) {
+  fs.appendFile(__dirname + '/Logs.txt', text + "\r\n\n", (err) => {
+    console.log('Data add')
+    if(err) throw err;
+  });
 }

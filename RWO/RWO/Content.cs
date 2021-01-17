@@ -24,6 +24,7 @@ namespace RWO
         public List<Book> FilterGenres = new List<Book>();
         public List<Book> FilterLanguages = new List<Book>();
         public List<Book> FilterAgeLimits = new List<Book>();
+        public string UserInfo = null;
         public Content(AuthForm Auth, User user)
         {
             InitializeComponent();
@@ -31,13 +32,29 @@ namespace RWO
             NetworkUser = user;
         }
 
-        private void Content_Load(object sender, EventArgs e)
+        public void Content_Load(object sender, EventArgs e)
         {
-            DBConnection API = new DBConnection();
-            string result = API.GetJSON("/api/books");
-            if (result != null && API.ExceptionMessage == null)
+            
+            if (NetworkUser is UserOffer offer)
             {
-                AllBooks = JsonSerializer.Deserialize<List<Book>>(result);
+                WrittersList.Visible = true;
+                UserInfo = NetworkUser.id + "/" + offer.role;
+            }
+            else if (NetworkUser is UserReader reader)
+            {
+                ShowReadBook.Visible = true;
+                UserInfo = NetworkUser.id + "/" + reader.role;
+            }
+            else if (NetworkUser is UserWritter writter)
+            {
+                OnLoadBook.Visible = true;
+                UserInfo = NetworkUser.id + "/" + writter.role;
+            }
+            DBConnection API = new DBConnection();
+            string JsonBook = API.GetJSON("/api/books/" + UserInfo);
+            if (JsonBook != null && API.ExceptionMessage == null)
+            {
+                AllBooks = JsonSerializer.Deserialize<List<Book>>(JsonBook);
                 books = new List<Book>(AllBooks);
                 var ImgList = new ImageList
                 {
@@ -54,23 +71,11 @@ namespace RWO
             else
             {
                 MessageBox.Show(
-                        API.ExceptionMessage,
+                        API.ExceptionMessage != null ? API.ExceptionMessage : JsonBook,
                         "Ошибка получения книг",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error
                     );
-            }
-            if (NetworkUser is UserOffer)
-            {
-                WrittersList.Visible = true;
-            } 
-            else if (NetworkUser is UserReader)
-            {
-                ShowReadBook.Visible = true;
-            }
-            else if (NetworkUser is UserWritter)
-            {
-                OnLoadBook.Visible = true;
             }
             ToolStripMenuItem DownloadItem = new ToolStripMenuItem("Скачать");
             ToolStripMenuItem DeleteItem = new ToolStripMenuItem("Удалить из списка");
@@ -119,7 +124,7 @@ namespace RWO
                 Book book = books.Find(item => item == (Book)SelectItem.Tag);
                 if (book != null)
                 {
-                    string textbook = API.GetJSON("/api/text/book/" + book.id);
+                    string textbook = API.GetJSON("/api/text/book/" + book.id + "/" + UserInfo);
                     book.text_composition = textbook.Remove(0, 2);
                     if (FolderPath != null)
                     {

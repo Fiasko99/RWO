@@ -142,7 +142,7 @@ namespace RWO
                     string msg = "Вы не подтвердили почту. " +
                         "Вам нужно подтвердить почту, " +
                         "если не прошло более 5 часов с момента регистрации";
-                    ExceptionMessage = response.Contains("blocked") ? msg : null;
+                    ExceptionMessage = response.Contains("confirm") ? msg : null;
                     string IsJson = response.Contains('{') && response.Contains('}') ? response : null;
                     if (IsJson != null)
                     {
