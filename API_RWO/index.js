@@ -16,9 +16,9 @@ const {
   compositions, rating,
   age_limits, readers,
   offers, writters,
-  sponsorship
+  sponsorship,
+  languages
 } = require('./modules/db')
-const { mkdir } = require('fs')
 let PORT = process.env.PORT || 3001;
 let uri = `http://176.100.0.104:${PORT}`
 
@@ -40,6 +40,7 @@ app.use(express.static('app'))
 const sequelize = conSeq()
 
 // Стэк модулей для базы данных
+const Languages = sequelize.define('languages', languages)
 const Readers = sequelize.define('readers', readers)
 const Writters = sequelize.define('writters', writters)
 const Offers = sequelize.define('offers', offers)
@@ -83,23 +84,6 @@ let NotComfirmUsers = [
     role: '-1'
   }
 ]
-
-
-fileHandler()
-function fileHandler(){
-
-  fs.readFile('NotConfirmUsers.txt', 'utf8', (err, data) => {
-      if(err) throw err;
-      console.log('--------- [File Data] ---------')
-      console.log(NotComfirmUsers)
-      console.log(data)
-      console.log('--------- [File Data] ---------')
-  })
-
-}
-
-
-
 
 app.get('/api/confirm/:id', (req, res) => {
   if (NotComfirmUsers.findIndex(user => user.id == req.params.id)) {
@@ -211,7 +195,7 @@ app.get('/api/books', async (req, res) => {
     attributes: [
       'id', 'name_composition', 
       'genre', 'age_limit_id',
-      'writter_id',
+      'writter_id', 'language_id'
     ]
   }).catch(() => {
     return res.end('Fail')
@@ -233,12 +217,21 @@ app.get('/api/books', async (req, res) => {
         'value'
       ]
     })
+    let language = await Languages.findOne({
+      where: {
+        id: book.language_id
+      },
+      attributes: [
+        'name'
+      ]
+    })
     let newFormBook = {
       id: book.id,
       name_composition: book.name_composition,
       genre: book.genre,
       writter_name: writter.name + " " + writter.surname,
-      age_limit_value: age_limit.value.toString()
+      age_limit_value: age_limit.value.toString(),
+      language: language.name
     }
     newFormBooks.push(newFormBook)
   }
@@ -260,6 +253,21 @@ app.get('/api/writters/list', async (req, res) => {
   }).then(response => {
     return res.end(
       JSON.stringify(response)
+    )
+  })
+})
+
+app.get('/api/text/book/:id', async (req, res) => {
+  await Compositions.findOne({
+    where: {
+      id: req.params.id
+    },
+    attributes: [
+      'text_composition'
+    ]
+  }).then(response => {
+    return res.end(
+      "{}" + response.text_composition
     )
   })
 })
@@ -307,7 +315,7 @@ async function checkWriter(login, password) {
       'surname', 'email',
       'work_experience'
     ]
-  }).catch(err => {
+  }).catch(() => {
     return 'error'
   })
   if (user) {
@@ -344,7 +352,7 @@ async function checkOffer(login, password) {
 
 // Ассоциации Базы Данных
 function associationsDB() {
-  Compositions.belongsTo(AgeLimits,{
+  Compositions.belongsTo(AgeLimits, {
     foreignKey: {
       name: 'age_limit_id',
       allowNull: false
@@ -353,6 +361,18 @@ function associationsDB() {
   })
   AgeLimits.hasMany(Compositions, {
     foreignKey: 'age_limit_id',
+    as: 'compositions'
+  })
+
+  Compositions.belongsTo(Languages, {
+    foreignKey: {
+      name: 'id',
+      allowNull: false
+    },
+    as: 'language'
+  })
+  Languages.hasMany(Compositions, {
+    foreignKey: 'language_id',
     as: 'compositions'
   })
 

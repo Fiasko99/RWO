@@ -144,6 +144,19 @@ let compositions = {
   }
 }
 
+let languages = {
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false
+  },
+  name: {
+    type: Sequelize.STRING(5),
+    allowNull: false
+  }
+}
+
 let sponsorship = {
   id: {
     type: Sequelize.INTEGER,
@@ -163,6 +176,7 @@ let rating = {
 }
 
 module.exports = {
+  languages,
   compositions, rating,
   age_limits, readers,
   offers, writters,

@@ -41,6 +41,7 @@ namespace RWO
             this.LastPage = new System.Windows.Forms.Button();
             this.WrittersOnList = new System.Windows.Forms.ComboBox();
             this.InfoLabel = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // WrittersListView
@@ -62,6 +63,7 @@ namespace RWO
             this.WrittersListView.View = System.Windows.Forms.View.Details;
             this.WrittersListView.DrawColumnHeader += new System.Windows.Forms.DrawListViewColumnHeaderEventHandler(this.WrittersListView_DrawColumnHeader);
             this.WrittersListView.DrawItem += new System.Windows.Forms.DrawListViewItemEventHandler(this.WrittersListView_DrawItem);
+            this.WrittersListView.DoubleClick += new System.EventHandler(this.WrittersListView_DoubleClick);
             this.WrittersListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.WrittersListView_MouseDoubleClick);
             // 
             // NameWritter
@@ -83,7 +85,7 @@ namespace RWO
             // 
             this.PreviousPage.Location = new System.Drawing.Point(12, 12);
             this.PreviousPage.Name = "PreviousPage";
-            this.PreviousPage.Size = new System.Drawing.Size(75, 23);
+            this.PreviousPage.Size = new System.Drawing.Size(36, 23);
             this.PreviousPage.TabIndex = 1;
             this.PreviousPage.Text = "<<";
             this.PreviousPage.UseVisualStyleBackColor = true;
@@ -91,9 +93,9 @@ namespace RWO
             // 
             // NextPage
             // 
-            this.NextPage.Location = new System.Drawing.Point(135, 13);
+            this.NextPage.Location = new System.Drawing.Point(73, 12);
             this.NextPage.Name = "NextPage";
-            this.NextPage.Size = new System.Drawing.Size(75, 23);
+            this.NextPage.Size = new System.Drawing.Size(29, 23);
             this.NextPage.TabIndex = 2;
             this.NextPage.Text = ">>";
             this.NextPage.UseVisualStyleBackColor = true;
@@ -102,7 +104,7 @@ namespace RWO
             // NumberPage
             // 
             this.NumberPage.AutoSize = true;
-            this.NumberPage.Location = new System.Drawing.Point(105, 18);
+            this.NumberPage.Location = new System.Drawing.Point(54, 17);
             this.NumberPage.Name = "NumberPage";
             this.NumberPage.Size = new System.Drawing.Size(13, 13);
             this.NumberPage.TabIndex = 3;
@@ -116,15 +118,15 @@ namespace RWO
             "По имени",
             "По имени книги",
             "По стажу"});
-            this.SortWritters.Location = new System.Drawing.Point(667, 14);
+            this.SortWritters.Location = new System.Drawing.Point(559, 14);
             this.SortWritters.Name = "SortWritters";
-            this.SortWritters.Size = new System.Drawing.Size(121, 21);
+            this.SortWritters.Size = new System.Drawing.Size(108, 21);
             this.SortWritters.TabIndex = 4;
             this.SortWritters.Text = "Сортировка";
             // 
             // FirstPage
             // 
-            this.FirstPage.Location = new System.Drawing.Point(216, 12);
+            this.FirstPage.Location = new System.Drawing.Point(108, 12);
             this.FirstPage.Name = "FirstPage";
             this.FirstPage.Size = new System.Drawing.Size(111, 23);
             this.FirstPage.TabIndex = 5;
@@ -134,7 +136,7 @@ namespace RWO
             // 
             // LastPage
             // 
-            this.LastPage.Location = new System.Drawing.Point(333, 13);
+            this.LastPage.Location = new System.Drawing.Point(225, 12);
             this.LastPage.Name = "LastPage";
             this.LastPage.Size = new System.Drawing.Size(134, 23);
             this.LastPage.TabIndex = 6;
@@ -152,7 +154,7 @@ namespace RWO
             "30",
             "50",
             "100"});
-            this.WrittersOnList.Location = new System.Drawing.Point(606, 14);
+            this.WrittersOnList.Location = new System.Drawing.Point(498, 14);
             this.WrittersOnList.Name = "WrittersOnList";
             this.WrittersOnList.Size = new System.Drawing.Size(55, 21);
             this.WrittersOnList.TabIndex = 7;
@@ -161,17 +163,31 @@ namespace RWO
             // InfoLabel
             // 
             this.InfoLabel.AutoSize = true;
-            this.InfoLabel.Location = new System.Drawing.Point(473, 17);
+            this.InfoLabel.Location = new System.Drawing.Point(365, 17);
             this.InfoLabel.Name = "InfoLabel";
             this.InfoLabel.Size = new System.Drawing.Size(127, 13);
             this.InfoLabel.TabIndex = 8;
             this.InfoLabel.Text = "Писателей на странице";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "По имени",
+            "По имени книги",
+            "По стажу"});
+            this.comboBox1.Location = new System.Drawing.Point(673, 14);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(115, 21);
+            this.comboBox1.TabIndex = 9;
+            this.comboBox1.Text = "Сортировка";
             // 
             // WrittersListForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.InfoLabel);
             this.Controls.Add(this.WrittersOnList);
             this.Controls.Add(this.LastPage);
@@ -203,5 +219,6 @@ namespace RWO
         private System.Windows.Forms.Button LastPage;
         private System.Windows.Forms.ComboBox WrittersOnList;
         private System.Windows.Forms.Label InfoLabel;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -12,14 +13,17 @@ using System.Windows.Forms;
 
 namespace RWO
 {
-
-   
     public partial class Content : Form
     {
         private readonly AuthForm auth;
         public int countbooksvalue;
         public List<Book> books;
+        public List<Book> AllBooks;
         User NetworkUser;
+        public List<Book> FilterWritters = new List<Book>();
+        public List<Book> FilterGenres = new List<Book>();
+        public List<Book> FilterLanguages = new List<Book>();
+        public List<Book> FilterAgeLimits = new List<Book>();
         public Content(AuthForm Auth, User user)
         {
             InitializeComponent();
@@ -33,7 +37,8 @@ namespace RWO
             string result = API.GetJSON("/api/books");
             if (result != null && API.ExceptionMessage == null)
             {
-                books = JsonSerializer.Deserialize<List<Book>>(result);
+                AllBooks = JsonSerializer.Deserialize<List<Book>>(result);
+                books = new List<Book>(AllBooks);
                 var ImgList = new ImageList
                 {
                     ImageSize = new Size(32, 42)
@@ -44,6 +49,7 @@ namespace RWO
                 CountBooks.Text = "10";
                 countbooksvalue = int.Parse(NumberPage.Text) * int.Parse(CountBooks.Text);
                 CountBooksStep();
+                FillFilters();
             } 
             else
             {
@@ -66,9 +72,143 @@ namespace RWO
             {
                 OnLoadBook.Visible = true;
             }
+            ToolStripMenuItem DownloadItem = new ToolStripMenuItem("Скачать");
+            ToolStripMenuItem DeleteItem = new ToolStripMenuItem("Удалить из списка");
+            // добавляем элементы в меню
+            SelectBookMenu.Items.AddRange(new[] { DownloadItem, DeleteItem });
+            // ассоциируем контекстное меню с текстовым полем
+            ContentListView.ContextMenuStrip = SelectBookMenu;
+            // устанавливаем обработчики событий для меню
+            DownloadItem.Click += DownLoadItem_Click;
+            DeleteItem.Click += DeleteItem_Click;
         }
+
+        public void DeleteItem_Click(object sender, EventArgs e)
+        {
+            var SelectItems = ContentListView.SelectedItems;
+            foreach (ListViewItem SelectItem in SelectItems)
+            {
+                int index = books.FindIndex(book => book == (Book)SelectItem.Tag);
+                if (index != -1)
+                {
+                    books.RemoveAt(index);
+                    AllBooks.RemoveAt(index);
+                }
+            }
+            CountBooksStep();
+            FillFilters();
+        } 
+
+        private void DownLoadItem_Click(object sender, EventArgs e)
+        {
+            var SelectItems = ContentListView.SelectedItems;
+            DBConnection API = new DBConnection();
+            string FolderPath = null;
+            using (var fbd = new FolderBrowserDialog())
+            {
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK)
+                {
+                    FolderPath = fbd.SelectedPath;
+                }
+            }
+            string path = null;
+            foreach (ListViewItem SelectItem in SelectItems)
+            {
+                Book book = books.Find(item => item == (Book)SelectItem.Tag);
+                if (book != null)
+                {
+                    string textbook = API.GetJSON("/api/text/book/" + book.id);
+                    book.text_composition = textbook.Remove(0, 2);
+                    if (FolderPath != null)
+                    {
+                        path = FolderPath + "/Книга " + book.name_composition + ".txt";
+                        File.WriteAllText(path,
+                                "Название произведения: " + book.name_composition + "\r\n\n" +
+                                "Возрастное ограничение: " + book.age_limit_value + "\r\n\n" +
+                                "Автор произведения: " + book.writter_name + "\r\n\n" +
+                                book.text_composition
+                            );
+                        // TODO: save on pdf & doxx format
+                    }
+                }
+            }
+            if (path != null)
+            {
+                MessageBox.Show(
+                        "Сохранено",
+                        "Успешное сохранение",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+            } 
+            else
+            {
+                MessageBox.Show(
+                        "Вы не выбрали путь",
+                        "Не сохранено",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
+            }
+
+        }
+
+        public void FillFilters()
+        {
+            SelectValueForFilters(ComboWritters, "Все писатели");
+            SelectValueForFilters(ComboGenres, "Все жанры");
+            SelectValueForFilters(ComboLang, "Все языки");
+            SelectValueForFilters(ComboAgeLimits, "Все возраста");
+
+            for (int i = 0; i < books.Count; i++)
+            {
+                if (ComboWritters.FindString(books[i].writter_name) == -1)
+                {
+                    ComboWritters.Items.Add(books[i].writter_name);
+                }
+                if (ComboGenres.FindString(books[i].genre) == -1)
+                {
+                    ComboGenres.Items.Add(books[i].genre);
+                }
+                if (ComboLang.FindString(books[i].language) == -1)
+                {
+                    ComboLang.Items.Add(books[i].language);
+                }
+                if (ComboAgeLimits.FindString(books[i].age_limit_value) == -1)
+                {
+                    ComboAgeLimits.Items.Add(books[i].age_limit_value);
+                }
+            }
+        }
+
+        private void SelectValueForFilters(ComboBox combobox, string defaultstr )
+        {
+            if (combobox.Text.Contains("Все"))
+            {
+                combobox.Items.Clear();
+            } 
+            else if (combobox.SelectedIndex != -1)
+            {
+                string tmp = combobox.Text;
+                combobox.Items.Clear();
+                combobox.Items.Add(tmp);
+                combobox.Text = tmp;
+            }
+            if (combobox.FindString(defaultstr) == -1)
+            {
+                combobox.Items.Add(defaultstr);
+                if (combobox.SelectedIndex == -1)
+                {
+                    combobox.Text = defaultstr;
+                }
+            }
+        }
+
         public void CountBooksStep()
         {
+            
             ContentListView.Items.Clear();
             for (
                     int i = int.Parse(NumberPage.Text) * int.Parse(CountBooks.Text) - int.Parse(CountBooks.Text);
@@ -82,7 +222,8 @@ namespace RWO
                         books[i].name_composition +
                         " (" + books[i].age_limit_value + ")",
                         books[i].writter_name,
-                        books[i].genre
+                        books[i].genre,
+                        books[i].language
                     });
                 lv.Tag = books[i];
                 lv.ImageIndex = 0;
@@ -90,6 +231,7 @@ namespace RWO
                 ContentListView.Items.Add(
                         lv
                     );
+                
             }
             TableFormatForListView();
         }
@@ -194,6 +336,81 @@ namespace RWO
         {
             // TODO: Read book show
         }
+
+        private void FilterProcess()
+        {
+            books.Clear();
+            ResetListFilters();
+            FilterGenres = FilterOfComboName(ComboGenres, "genre");
+            FilterWritters = FilterOfComboName(ComboWritters, "writter");
+            FilterAgeLimits = FilterOfComboName(ComboAgeLimits, "ageLimit");
+            FilterLanguages = FilterOfComboName(ComboLang, "language");
+
+            books = new List<Book>(FilterGenres);
+            books = new List<Book>(books.Intersect(FilterWritters));
+            books = new List<Book>(books.Intersect(FilterAgeLimits));
+            books = new List<Book>(books.Intersect(FilterLanguages));
+            CountBooksStep();
+            FillFilters();
+        }
+
+        private void ResetListFilters()
+        {
+            FilterGenres.Clear();
+            FilterWritters.Clear();
+            FilterAgeLimits.Clear();
+            FilterLanguages.Clear();
+        }
+
+        private List<Book> FilterOfComboName(ComboBox comboBox, string typeFilter)
+        {
+            if (comboBox.Text.Contains("Все"))
+            {
+                return new List<Book>(AllBooks);
+            }
+            else 
+            {
+                List<Book> FilterList = new List<Book>();
+                foreach (Book book in AllBooks)
+                {
+                    if (comboBox.Text == book.genre && typeFilter == "genre")
+                    {
+                        FilterList.Add(book);
+                    }
+                    else if (comboBox.Text == book.age_limit_value && typeFilter == "ageLimit")
+                    {
+                        FilterList.Add(book);
+                    }
+                    else if (comboBox.Text == book.writter_name && typeFilter == "writter")
+                    {
+                        FilterList.Add(book);
+                    }
+                    else if (comboBox.Text == book.language && typeFilter == "language")
+                    {
+                        FilterList.Add(book);
+                    }
+                }
+                return FilterList;
+            }
+            return new List<Book>();
+        }
+
+        private void ComboGenres_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            FilterProcess();
+        }
+        private void ComboWritters_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            FilterProcess();
+        }
+        private void ComboAgeLimits_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            FilterProcess();
+        }
+        private void ComboLang_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            FilterProcess();
+        }
     }
     public class Book
     {
@@ -202,13 +419,16 @@ namespace RWO
         public string genre { get; set; }
         public string writter_name { get; set; }
         public string age_limit_value { get; set; }
+        public string language { get; set; }
+        public string text_composition { get; set; }
 
         public Book(
                 long id, 
                 string name_composition, 
                 string genre,
                 string writter_name,
-                string age_limit_value
+                string age_limit_value,
+                string language
             )
         {
             this.id = id;
@@ -216,6 +436,7 @@ namespace RWO
             this.genre = genre;
             this.writter_name = writter_name;
             this.age_limit_value = age_limit_value;
+            this.language = language;
         }
     }
 }

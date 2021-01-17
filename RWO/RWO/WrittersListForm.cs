@@ -178,6 +178,11 @@ namespace RWO
             }).Start();
             Hide();
         }
+
+        private void WrittersListView_DoubleClick(object sender, EventArgs e)
+        {
+
+        }
     }
     public class Writter
     {

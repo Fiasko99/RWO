@@ -29,6 +29,7 @@ namespace RWO
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.BtnToProfileForm = new System.Windows.Forms.Button();
             this.ExitProfile = new System.Windows.Forms.Button();
             this.ContentListView = new System.Windows.Forms.ListView();
@@ -36,25 +37,30 @@ namespace RWO
             this.NameBook = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Author = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Genre = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.LangColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.CountBooks = new System.Windows.Forms.ComboBox();
             this.BtnPageOne = new System.Windows.Forms.Button();
             this.BtnPageLast = new System.Windows.Forms.Button();
             this.PreviousPage = new System.Windows.Forms.Button();
             this.NextPage = new System.Windows.Forms.Button();
             this.NumberPage = new System.Windows.Forms.Label();
-            this.FilterListView = new System.Windows.Forms.ComboBox();
             this.CaptionCountBookLabel = new System.Windows.Forms.Label();
             this.WrittersList = new System.Windows.Forms.Button();
             this.OnLoadBook = new System.Windows.Forms.Button();
             this.ShowReadBook = new System.Windows.Forms.Button();
+            this.ComboGenres = new System.Windows.Forms.ComboBox();
+            this.ComboWritters = new System.Windows.Forms.ComboBox();
+            this.ComboAgeLimits = new System.Windows.Forms.ComboBox();
+            this.ComboLang = new System.Windows.Forms.ComboBox();
+            this.SelectBookMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SuspendLayout();
             // 
             // BtnToProfileForm
             // 
             this.BtnToProfileForm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnToProfileForm.Location = new System.Drawing.Point(713, 13);
+            this.BtnToProfileForm.Location = new System.Drawing.Point(396, 40);
             this.BtnToProfileForm.Name = "BtnToProfileForm";
-            this.BtnToProfileForm.Size = new System.Drawing.Size(75, 23);
+            this.BtnToProfileForm.Size = new System.Drawing.Size(107, 23);
             this.BtnToProfileForm.TabIndex = 0;
             this.BtnToProfileForm.Text = "Профиль";
             this.BtnToProfileForm.UseVisualStyleBackColor = true;
@@ -78,15 +84,16 @@ namespace RWO
             this.Images,
             this.NameBook,
             this.Author,
-            this.Genre});
+            this.Genre,
+            this.LangColumn});
             this.ContentListView.Cursor = System.Windows.Forms.Cursors.Hand;
             this.ContentListView.FullRowSelect = true;
             this.ContentListView.GridLines = true;
             this.ContentListView.HideSelection = false;
-            this.ContentListView.Location = new System.Drawing.Point(11, 79);
+            this.ContentListView.Location = new System.Drawing.Point(11, 69);
             this.ContentListView.Name = "ContentListView";
             this.ContentListView.OwnerDraw = true;
-            this.ContentListView.Size = new System.Drawing.Size(779, 382);
+            this.ContentListView.Size = new System.Drawing.Size(797, 392);
             this.ContentListView.TabIndex = 2;
             this.ContentListView.UseCompatibleStateImageBehavior = false;
             this.ContentListView.View = System.Windows.Forms.View.Details;
@@ -111,7 +118,12 @@ namespace RWO
             // Genre
             // 
             this.Genre.Text = "Жанры";
-            this.Genre.Width = 284;
+            this.Genre.Width = 113;
+            // 
+            // LangColumn
+            // 
+            this.LangColumn.Text = "Язык";
+            this.LangColumn.Width = 94;
             // 
             // CountBooks
             // 
@@ -131,9 +143,9 @@ namespace RWO
             // 
             // BtnPageOne
             // 
-            this.BtnPageOne.Location = new System.Drawing.Point(212, 13);
+            this.BtnPageOne.Location = new System.Drawing.Point(131, 13);
             this.BtnPageOne.Name = "BtnPageOne";
-            this.BtnPageOne.Size = new System.Drawing.Size(118, 23);
+            this.BtnPageOne.Size = new System.Drawing.Size(114, 23);
             this.BtnPageOne.TabIndex = 4;
             this.BtnPageOne.Text = "На первую старицу";
             this.BtnPageOne.UseVisualStyleBackColor = true;
@@ -142,9 +154,9 @@ namespace RWO
             // BtnPageLast
             // 
             this.BtnPageLast.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnPageLast.Location = new System.Drawing.Point(475, 13);
+            this.BtnPageLast.Location = new System.Drawing.Point(363, 13);
             this.BtnPageLast.Name = "BtnPageLast";
-            this.BtnPageLast.Size = new System.Drawing.Size(151, 23);
+            this.BtnPageLast.Size = new System.Drawing.Size(140, 23);
             this.BtnPageLast.TabIndex = 5;
             this.BtnPageLast.Text = "На последнюю страницу";
             this.BtnPageLast.UseVisualStyleBackColor = true;
@@ -152,9 +164,9 @@ namespace RWO
             // 
             // PreviousPage
             // 
-            this.PreviousPage.Location = new System.Drawing.Point(131, 13);
+            this.PreviousPage.Location = new System.Drawing.Point(251, 13);
             this.PreviousPage.Name = "PreviousPage";
-            this.PreviousPage.Size = new System.Drawing.Size(75, 23);
+            this.PreviousPage.Size = new System.Drawing.Size(33, 23);
             this.PreviousPage.TabIndex = 6;
             this.PreviousPage.Text = "<<";
             this.PreviousPage.UseVisualStyleBackColor = true;
@@ -163,9 +175,9 @@ namespace RWO
             // NextPage
             // 
             this.NextPage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.NextPage.Location = new System.Drawing.Point(632, 13);
+            this.NextPage.Location = new System.Drawing.Point(327, 13);
             this.NextPage.Name = "NextPage";
-            this.NextPage.Size = new System.Drawing.Size(75, 23);
+            this.NextPage.Size = new System.Drawing.Size(30, 23);
             this.NextPage.TabIndex = 7;
             this.NextPage.Text = ">>";
             this.NextPage.UseVisualStyleBackColor = true;
@@ -175,20 +187,11 @@ namespace RWO
             // 
             this.NumberPage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.NumberPage.AutoSize = true;
-            this.NumberPage.Location = new System.Drawing.Point(393, 18);
+            this.NumberPage.Location = new System.Drawing.Point(308, 18);
             this.NumberPage.Name = "NumberPage";
             this.NumberPage.Size = new System.Drawing.Size(13, 13);
             this.NumberPage.TabIndex = 8;
             this.NumberPage.Text = "1";
-            // 
-            // FilterListView
-            // 
-            this.FilterListView.FormattingEnabled = true;
-            this.FilterListView.Location = new System.Drawing.Point(475, 42);
-            this.FilterListView.Name = "FilterListView";
-            this.FilterListView.Size = new System.Drawing.Size(315, 21);
-            this.FilterListView.TabIndex = 9;
-            this.FilterListView.Text = "Фильтр";
             // 
             // CaptionCountBookLabel
             // 
@@ -203,7 +206,7 @@ namespace RWO
             // 
             this.WrittersList.Location = new System.Drawing.Point(212, 40);
             this.WrittersList.Name = "WrittersList";
-            this.WrittersList.Size = new System.Drawing.Size(257, 23);
+            this.WrittersList.Size = new System.Drawing.Size(178, 23);
             this.WrittersList.TabIndex = 11;
             this.WrittersList.Text = "Посмотреть список писателей";
             this.WrittersList.UseVisualStyleBackColor = true;
@@ -214,7 +217,7 @@ namespace RWO
             // 
             this.OnLoadBook.Location = new System.Drawing.Point(212, 40);
             this.OnLoadBook.Name = "OnLoadBook";
-            this.OnLoadBook.Size = new System.Drawing.Size(257, 23);
+            this.OnLoadBook.Size = new System.Drawing.Size(178, 23);
             this.OnLoadBook.TabIndex = 12;
             this.OnLoadBook.Text = "Загрузить произведение";
             this.OnLoadBook.UseVisualStyleBackColor = true;
@@ -225,23 +228,75 @@ namespace RWO
             // 
             this.ShowReadBook.Location = new System.Drawing.Point(212, 40);
             this.ShowReadBook.Name = "ShowReadBook";
-            this.ShowReadBook.Size = new System.Drawing.Size(257, 23);
+            this.ShowReadBook.Size = new System.Drawing.Size(178, 23);
             this.ShowReadBook.TabIndex = 13;
             this.ShowReadBook.Text = "Показать прочитанное";
             this.ShowReadBook.UseVisualStyleBackColor = true;
             this.ShowReadBook.Visible = false;
             this.ShowReadBook.Click += new System.EventHandler(this.ShowReadBook_Click);
             // 
+            // ComboGenres
+            // 
+            this.ComboGenres.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ComboGenres.FormattingEnabled = true;
+            this.ComboGenres.Location = new System.Drawing.Point(509, 15);
+            this.ComboGenres.Name = "ComboGenres";
+            this.ComboGenres.Size = new System.Drawing.Size(130, 21);
+            this.ComboGenres.TabIndex = 14;
+            this.ComboGenres.TabStop = false;
+            this.ComboGenres.SelectionChangeCommitted += new System.EventHandler(this.ComboGenres_SelectionChangeCommitted);
+            // 
+            // ComboWritters
+            // 
+            this.ComboWritters.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ComboWritters.FormattingEnabled = true;
+            this.ComboWritters.Location = new System.Drawing.Point(663, 15);
+            this.ComboWritters.Name = "ComboWritters";
+            this.ComboWritters.Size = new System.Drawing.Size(145, 21);
+            this.ComboWritters.TabIndex = 15;
+            this.ComboWritters.TabStop = false;
+            this.ComboWritters.SelectionChangeCommitted += new System.EventHandler(this.ComboWritters_SelectionChangeCommitted);
+            // 
+            // ComboAgeLimits
+            // 
+            this.ComboAgeLimits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ComboAgeLimits.FormattingEnabled = true;
+            this.ComboAgeLimits.Location = new System.Drawing.Point(509, 40);
+            this.ComboAgeLimits.Name = "ComboAgeLimits";
+            this.ComboAgeLimits.Size = new System.Drawing.Size(130, 21);
+            this.ComboAgeLimits.TabIndex = 16;
+            this.ComboAgeLimits.TabStop = false;
+            this.ComboAgeLimits.SelectionChangeCommitted += new System.EventHandler(this.ComboAgeLimits_SelectionChangeCommitted);
+            // 
+            // ComboLang
+            // 
+            this.ComboLang.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ComboLang.FormattingEnabled = true;
+            this.ComboLang.Location = new System.Drawing.Point(663, 40);
+            this.ComboLang.Name = "ComboLang";
+            this.ComboLang.Size = new System.Drawing.Size(145, 21);
+            this.ComboLang.TabIndex = 17;
+            this.ComboLang.TabStop = false;
+            this.ComboLang.SelectionChangeCommitted += new System.EventHandler(this.ComboLang_SelectionChangeCommitted);
+            // 
+            // SelectBookMenu
+            // 
+            this.SelectBookMenu.Name = "SelectBookMenu";
+            this.SelectBookMenu.Size = new System.Drawing.Size(61, 4);
+            // 
             // Content
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 473);
+            this.ClientSize = new System.Drawing.Size(818, 473);
+            this.Controls.Add(this.ComboLang);
+            this.Controls.Add(this.ComboAgeLimits);
+            this.Controls.Add(this.ComboWritters);
+            this.Controls.Add(this.ComboGenres);
             this.Controls.Add(this.ShowReadBook);
             this.Controls.Add(this.OnLoadBook);
             this.Controls.Add(this.WrittersList);
             this.Controls.Add(this.CaptionCountBookLabel);
-            this.Controls.Add(this.FilterListView);
             this.Controls.Add(this.NumberPage);
             this.Controls.Add(this.NextPage);
             this.Controls.Add(this.PreviousPage);
@@ -275,10 +330,15 @@ namespace RWO
         private System.Windows.Forms.Button PreviousPage;
         private System.Windows.Forms.Button NextPage;
         private System.Windows.Forms.Label NumberPage;
-        private System.Windows.Forms.ComboBox FilterListView;
         private System.Windows.Forms.Label CaptionCountBookLabel;
         private System.Windows.Forms.Button WrittersList;
         private System.Windows.Forms.Button OnLoadBook;
         private System.Windows.Forms.Button ShowReadBook;
+        private System.Windows.Forms.ComboBox ComboGenres;
+        private System.Windows.Forms.ComboBox ComboWritters;
+        private System.Windows.Forms.ComboBox ComboAgeLimits;
+        private System.Windows.Forms.ComboBox ComboLang;
+        private System.Windows.Forms.ColumnHeader LangColumn;
+        private System.Windows.Forms.ContextMenuStrip SelectBookMenu;
     }
 }
