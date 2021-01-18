@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Windows.Forms;
@@ -215,9 +217,7 @@ namespace RWO
             if (FormatReport.SelectedIndex == 3 && sfd.ShowDialog() == DialogResult.OK)
             {
                 XDocument xdoc = new XDocument();
-                var xTree = new XElement("root",
-                            new XElement("Отчёт")
-                        );
+                var xTree = new XElement("root");
                 foreach (FullWritterReports writter in writtersForReports)
                 {
                     var writterxml = new XElement("Писатель",
@@ -232,10 +232,39 @@ namespace RWO
                 xdoc.Add(xTree);
                 xdoc.Save(sfd.InitialDirectory + sfd.FileName);
             } 
-            else
+            else if (sfd.ShowDialog() == DialogResult.OK)
             {
-
+                string report = null;
+                if (FormatReport.Text.Contains(';'))
+                {
+                    report = CreateCSVReport(writtersForReports, ';');
+                }
+                else if (FormatReport.Text.Contains(','))
+                {
+                    report = CreateCSVReport(writtersForReports, ',');
+                }
+                else if (FormatReport.Text.Contains('/'))
+                {
+                    report = CreateCSVReport(writtersForReports, '/');
+                }
+                File.WriteAllText(sfd.InitialDirectory + sfd.FileName, report, Encoding.UTF8);
             }
+        }
+
+        private string CreateCSVReport(List<FullWritterReports> writtersForReports, char v)
+        {
+            string convertCSV = "";
+            convertCSV += "Наименование" + v + "ДатаРегистрации" + v + "email" + v + "login" + v + "Подтверждён" + v;
+            foreach(FullWritterReports writter in writtersForReports)
+            {
+                convertCSV += "\r\n" 
+                    + writter.name + writter.surname + v 
+                    + writter.createdAt.ToString() + v
+                    + writter.email + v
+                    + writter.login + v
+                    + writter.confirm;
+            }
+            return convertCSV;
         }
     }
     public class Writter

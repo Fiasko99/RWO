@@ -2,8 +2,6 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const path = require('path')
-const multer = require('multer')
 const chalk = require('chalk')
 const { v4 } = require('uuid')
 const cors = require('cors')
@@ -672,8 +670,7 @@ function writeToFileLog(text) {
 
 function createReportFile(listXML, user, nameList) {
   let builder = require('xmlbuilder');
-  let doc = builder.create('root', { encoding: 'utf-8' });
-    doc.ele('Отчёт')  
+  let doc = builder.create('root', { encoding: 'utf-8' })
   for (let item of listXML) {
     doc
       .ele(nameList)
@@ -692,7 +689,6 @@ function createReportFile(listXML, user, nameList) {
         .ele('Подтверждён')
           .txt(item.confirm)
           .up()
-          
   }
   let path = `${v4()}USER=${user.name}.xml`
   fs.appendFile(__dirname + `/Reports/${path}`, doc.end({ pretty: true }), err => {
