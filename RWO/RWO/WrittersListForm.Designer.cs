@@ -170,9 +170,9 @@ namespace RWO
             // 
             this.FormatReport.FormattingEnabled = true;
             this.FormatReport.Items.AddRange(new object[] {
-            "CSV UTF-8 (разделитель - точка с запятой)|*.csv",
-            "CSV UTF-8 (разделитель - запятая)|*.csv",
-            "CSV UTF-8 (разделитель - слэш)|*.csv",
+            "CSV (разделитель -;)|*.csv",
+            "CSV (разделитель - ,)|*.csv",
+            "CSV (разделитель - /)|*.csv",
             "Язык разметки XML|*.xml"});
             this.FormatReport.Location = new System.Drawing.Point(559, 14);
             this.FormatReport.Name = "FormatReport";

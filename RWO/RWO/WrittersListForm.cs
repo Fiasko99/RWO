@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace RWO
 {
@@ -199,7 +196,46 @@ namespace RWO
         private void GetReport_Click(object sender, EventArgs e)
         {
             DBConnection API = new DBConnection();
-            var answer = API.GetJSON($"/api/report/create/writters/{UserActive.id}/Инвестор");
+            string answer = API.GetJSON($"/api/report/create/writters/{UserActive.id}/Инвестор");
+            string IsJson = answer.Contains('{') && answer.Contains('}') ? answer : "";
+            if (IsJson != "")
+            {
+                List<FullWritterReports> WrittersForReports = JsonSerializer.Deserialize<List<FullWritterReports>>(answer);
+                CreateReport(WrittersForReports);
+            }
+        }
+
+        private void CreateReport(List<FullWritterReports> writtersForReports)
+        {
+            SaveFileDialog sfd = new SaveFileDialog()
+            {
+                OverwritePrompt = true,
+                Filter = FormatReport.Text,
+            };
+            if (FormatReport.SelectedIndex == 3 && sfd.ShowDialog() == DialogResult.OK)
+            {
+                XDocument xdoc = new XDocument();
+                var xTree = new XElement("root",
+                            new XElement("Отчёт")
+                        );
+                foreach (FullWritterReports writter in writtersForReports)
+                {
+                    var writterxml = new XElement("Писатель",
+                                new XElement("Наименование", writter.name + " " + writter.surname),
+                                new XElement("ДатаРегистрации", writter.createdAt.ToString()),
+                                new XElement("email", writter.email),
+                                new XElement("login", writter.login),
+                                new XElement("Подтверждён", writter.confirm)
+                            );
+                    xTree.Add(writterxml);
+                }
+                xdoc.Add(xTree);
+                xdoc.Save(sfd.InitialDirectory + sfd.FileName);
+            } 
+            else
+            {
+
+            }
         }
     }
     public class Writter
@@ -220,6 +256,32 @@ namespace RWO
             this.surname = surname;
             this.work_expirience = work_expirience;
             this.last_book = last_book;
+        }
+    }
+
+    public class FullWritterReports 
+    {
+        public long id { get; set; }
+        public string login { get; set; }
+        public string name { get; set; }
+        public string surname { get; set; }
+        public string email { get; set; }
+        public DateTime createdAt { get; set; }
+        public bool confirm { get; set; }
+
+        public FullWritterReports(
+            long id, string login, string name, 
+            string surname, string email,
+            DateTime createdAt, bool confirm
+        )
+        {
+            this.id = id;
+            this.login = login;
+            this.name = name;
+            this.surname = surname;
+            this.email = email;
+            this.createdAt = createdAt;
+            this.confirm = confirm;
         }
     }
 }

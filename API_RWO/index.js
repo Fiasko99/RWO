@@ -73,8 +73,14 @@ app.get('/api/report/create/writters/:id/:role', async (req, res) => {
       return res.end('Fail database')
     })
   }
-  let writters = await Writters.findAll({})
-  let path = createReportFile(writters, queryUser, 'Писатели')
+  let writters = await Writters.findAll({
+    attributes: [
+      'id', 'login', 'name',
+      'surname', 'email', 'createdAt',
+      'confirm'
+    ]
+  })
+  let path = createReportFile(writters, queryUser, 'Писатель')
   await Reports.create({
     login: queryUser.login,
     link_file: `${uri}/static/reports/${path}`,
@@ -87,7 +93,9 @@ app.get('/api/report/create/writters/:id/:role', async (req, res) => {
                   Инициалы: ${queryUser.surname} ${queryUser.name} 
                   запросил отчёт писателей на клиенте в ${new Date()}
                 `)
-  
+  return res.end(
+    JSON.stringify(writters)
+  )
 })
 
 app.post('/api/login', async (req, res) => {
@@ -664,7 +672,7 @@ function writeToFileLog(text) {
 
 function createReportFile(listXML, user, nameList) {
   let builder = require('xmlbuilder');
-  let doc = builder.create('root');
+  let doc = builder.create('root', { encoding: 'utf-8' });
     doc.ele('Отчёт')  
   for (let item of listXML) {
     doc
@@ -684,9 +692,10 @@ function createReportFile(listXML, user, nameList) {
         .ele('Подтверждён')
           .txt(item.confirm)
           .up()
+          
   }
   let path = `${v4()}USER=${user.name}.xml`
-  fs.appendFile(__dirname + `/Reports/${path}`, doc.toString({ pretty: true }), err => {
+  fs.appendFile(__dirname + `/Reports/${path}`, doc.end({ pretty: true }), err => {
     console.log('Xml add')
     if(err) throw err;
   })
