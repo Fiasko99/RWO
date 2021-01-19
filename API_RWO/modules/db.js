@@ -38,6 +38,11 @@ let readers = {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
     allowNull: true
+  },
+  duplicate: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
   }
 }
 
@@ -64,6 +69,11 @@ let age_limits = {
   value: {
     type: Sequelize.INTEGER(2),
     allowNull: false
+  },
+  dublicate: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
   }
 }
 
@@ -106,6 +116,11 @@ let writters = {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
     allowNull: true
+  },
+  duplicate: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
   }
 }
 
@@ -145,6 +160,11 @@ let offers = {
     allowNull: true
   },
   confirm: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false,
+    allowNull: true
+  },
+  duplicate: {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
     allowNull: true
@@ -213,7 +233,12 @@ let admins = {
   password: {
     type: Sequelize.STRING(32),
     allowNull: false
-  }
+  },
+  email: {
+    type: Sequelize.STRING(32),
+    allowNull: false
+  }, 
+
 }
 
 let reports = {
@@ -238,6 +263,6 @@ module.exports = {
   compositions, rating,
   age_limits, readers,
   offers, writters,
-  sponsorship, reports
+  sponsorship, reports, admins
 }
 

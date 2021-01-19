@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
+using System.Linq;
 
 namespace RWO
 {
@@ -35,9 +30,9 @@ namespace RWO
 
         private void LoginBtn_Click(object sender, EventArgs e)
         {
+            DBConnection API = new DBConnection();
             if (ValidateData())
             {
-                DBConnection API = new DBConnection();
                 ValidateUser UserLogining = new ValidateUser(
                         LoginBox.Text, PassBox.Text, RoleCombo.Text
                     );
@@ -45,14 +40,49 @@ namespace RWO
                 new Thread(
                         () =>
                         {
-                            var res = API.PostUserJson(
+                            string res = API.PostJson(
                                     "/api/login",
-                                    JsonUserLogining,
-                                    UserLogining.Role
+                                    JsonUserLogining
                                 );
-                            CheckResult(res, API);
+                            if (res == "Почта не подтверждена")
+                            {
+                                MsgBoxError(
+                                        "Подтвердите почту",
+                                        res
+                                    );
+                            } 
+                            else if (res == "Доступ запрещён")
+                            {
+                                MsgBoxError(
+                                        res,
+                                        "Профиль заблокирован"
+                                    );
+                            } 
+                            else if (API.ExceptionMessage == null && res.Contains('{') && res.Contains('}'))
+                            {
+                                CheckResult(res, UserLogining.Role, API);
+                            } 
+                            else
+                            {
+                                MsgBoxError(res, "Неизвестная ошибка");
+                            }
                         }
                     ).Start();
+            } 
+            else if (LoginBox.TextLength > 0 && PassBox.TextLength > 0)
+            {
+                ValidateUser UserLogining = new ValidateUser(
+                        LoginBox.Text, PassBox.Text, RoleCombo.Text
+                    );
+                string JsonUserLogining = JsonSerializer.Serialize(UserLogining);
+                string IsAdmin = API.PostJson("/api/admin/" + LoginBox.Text, JsonUserLogining);
+                if (IsAdmin == "true")
+                {
+                    AdminForm AP = new AdminForm();
+                    AP.Show();
+                    Hide();
+                }
+
             }
         }
         public void ListenPort()
@@ -84,22 +114,23 @@ namespace RWO
             RoleCombo.SelectedIndex = 0;
         }
 
-        private void CheckResult(User res, DBConnection API)
+        private void CheckResult(string res, string role, DBConnection API)
         {
-            if (res != null && API.ExceptionMessage == null)
+            User user = null;
+            if (role == "Инвестор")
             {
-                StepAuth(res);
+                user = JsonSerializer.Deserialize<UserOffer>(res);
             } 
-            else if (API.ExceptionMessage != null)
-            {
-                MsgBoxError(API.ExceptionMessage, "Внутренняя ошибка");
+            else if (role == "Читатель") {
+                user = JsonSerializer.Deserialize<UserReader>(res);
             }
-            else
+            else if (role == "Писатель")
             {
-                MsgBoxError(
-                    "Проверьте правильность введённых данных",
-                    "Пользователь не найден"
-                   );
+                user = JsonSerializer.Deserialize<UserWritter>(res);
+            }
+            if (user != null)
+            {
+                StepAuth(user);
             }
         }
 
@@ -108,9 +139,9 @@ namespace RWO
             Invoke(
                 (MethodInvoker)delegate
                 {
-                    Hide();
                     Content ContentForm = new Content(this, res);
                     ContentForm.Show();
+                    Hide();
                 }
             );
         }
@@ -122,7 +153,7 @@ namespace RWO
                 MsgBoxWrong("Wrong input login (len symbol > 5). Please, fix it!\nНеправильно ввод данных (длина логина должна быть больше 5 символов)");
                 return false;
             }
-            if (PassBox.TextLength < 8)
+            if (PassBox.TextLength < 6)
             {
                 MsgBoxWrong("Wrong input password (len symbol > 7). Please, fix it!\nНеправильно ввод данных (длина пароля должна быть больше 7 символов)");
                 return false;
@@ -172,9 +203,8 @@ namespace RWO
 
         private void AuthForm_Load(object sender, EventArgs e)
         {
-            LoginBox.Text = "Ivanov";
-            PassBox.Text = "12345678";
-            RoleCombo.Text = "Инвестор";
+            LoginBox.Text = "admin";
+            PassBox.Text = "admin";
         }
     }
 }

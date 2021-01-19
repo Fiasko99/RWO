@@ -71,12 +71,15 @@ namespace RWO
                                         "/api/registration",
                                         JsonUserLogining
                                     );
-                                if (res == "Успешно")
-                                    MsgBoxSuccess("Подтвердите регистрацию на почте");
-                                else if (API.ExceptionMessage != null)
-                                    MsgBoxError(API.ExceptionMessage, "Регистрация не удалась");
-                                else
-                                    MsgBoxError("Неизвестная ошибка", "Регистрация не удалась");
+                                if (res.Contains('{') && res.Contains('}'))
+                                    MsgBoxSuccess("" +
+                                        "Подтвердите регистрацию на почте в течение пяти часов " +
+                                        "(не закрывайте приложение, чтобы оно автоматически открылось при подтверждении)" +
+                                        "");
+                                else if (res == "Ошибка отправки сообщения на почту")
+                                    MsgBoxError(res, "Введите корректную почту");
+                                else if (res == "База данных отключена")
+                                    MsgBoxError(res, "Сервис недоступен");
                             }
                     ).Start();
 
@@ -93,7 +96,7 @@ namespace RWO
                     );
                 return false;
             }
-            if (PassBox.TextLength < 8)
+            if (PassBox.TextLength < 6)
             {
                 MsgBoxWrong(
                         "Wrong input password (len symbol > 7). Please, fix it!\n" +

@@ -87,7 +87,6 @@ namespace RWO
     }
     class DBConnection
     {
-        User user = null;
         private readonly string URI = "http://176.100.0.104:3001";
         // Все методы класса возвращают строку с ответом на запрос или null - если возникла ошибка при подключении
         // Поле для отладки, -2 - проблемы при подключении, -1 - ошибка доступа, 1 - запрос был выполнен успешно
@@ -117,44 +116,6 @@ namespace RWO
 
             }
         }
-        // метод отправки JSON на сервер, adr - параметр запроса, str - JSON тело запроса
-        public User PostUserJson(string adr, string DataString, string role)
-        {
-            try
-            {
-                WebRequest request = WebRequest.Create(URI + adr);
-                request.Method = "POST";
-                byte[] byteArray = Encoding.UTF8.GetBytes(DataString);
-                request.ContentType = "application/json";
-                request.ContentLength = byteArray.Length;
-                Stream dataStream = request.GetRequestStream();
-                dataStream.Write(byteArray, 0, byteArray.Length);
-                dataStream.Close();
-                WebResponse GetRes = request.GetResponse();
-                var response = new StreamReader(GetRes.GetResponseStream()).ReadToEnd();
-                if (((HttpWebResponse)GetRes).StatusDescription == "OK")
-                {
-                    ExceptionMessage = response.Contains("error") ? "База данных отключена" : null;
-                    string msg = "Вы не подтвердили почту. " +
-                        "Вам нужно подтвердить почту, " +
-                        "если не прошло более 5 часов с момента регистрации";
-                    ExceptionMessage = response.Contains("confirm") ? msg : null;
-                    string IsJson = response.Contains('{') && response.Contains('}') ? response : null;
-                    if (IsJson != null)
-                    {
-                        return FillUserClass(IsJson, role);
-                    }
-                }
-                return null;
-            }
-            catch (Exception e)
-            {
-                // Запись сообщения об ошибки для отладки
-                ExceptionMessage = e.Message;
-                return null;
-
-            }
-        }
 
         public string PostJson(string adr, string DataString)
         {
@@ -172,13 +133,7 @@ namespace RWO
                 var response = new StreamReader(GetRes.GetResponseStream()).ReadToEnd();
                 if (((HttpWebResponse)GetRes).StatusDescription == "OK")
                 {
-                    ExceptionMessage = response.Contains("database") ? "База данных отключена" : null;
-                    ExceptionMessage = response.Contains("mail") ? "Неверная почта" : null;
-                    string IsJson = response.Contains('{') && response.Contains('}') ? response : null;
-                    if (IsJson != null)
-                    {
-                        return "Успешно";
-                    }
+                    return response;
                 }
                 return null;
             }
@@ -188,31 +143,6 @@ namespace RWO
                 ExceptionMessage = e.Message;
                 return "Ошибка запроса к серверу";
 
-            }
-        }
-        private User FillUserClass(string data, string role)
-        {
-            try
-            {
-                if (role == "Читатель")
-                {
-                    user = JsonSerializer.Deserialize<UserReader>(data);
-                }
-                else if (role == "Писатель")
-                {
-                    user = JsonSerializer.Deserialize<UserWritter>(data);
-                }
-                else if (role == "Инвестор") 
-                {
-                    user = JsonSerializer.Deserialize<UserOffer>(data);
-                }
-                return user;
-            }
-            catch (FormatException e)
-            {
-                // TODO: отправка внутренней ошибки на сервер
-                ExceptionMessage = e.Message;
-                return null;
             }
         }
     }

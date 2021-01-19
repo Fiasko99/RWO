@@ -16,11 +16,12 @@ const {
   offers, writters,
   sponsorship,
   languages,
-  genres, reports
+  genres, reports, admins
 } = require('./modules/db')
+const { resolve } = require('path')
 let PORT = process.env.PORT || 3001;
 let uri = `http://176.100.0.104:${PORT}`
-
+let errorDB = 'База данных отключена'
 // if (process.env.PORT || PORT) {
 //   // Корректная работа режима HTML5 history
 //   app.use(history());
@@ -41,6 +42,7 @@ const sequelize = conSeq()
 
 // Стэк модулей для базы данных
 const Languages = sequelize.define('languages', languages)
+const Admins = sequelize.define('admins', admins)
 const Reports = sequelize.define('reports', reports)
 const Genres = sequelize.define('genres', genres)
 const Readers = sequelize.define('readers', readers)
@@ -86,40 +88,43 @@ app.get('/api/report/create/writters/:id/:role', async (req, res) => {
     return res.send('Ошибка базы данных')
   })
   writeToFileLog(`
-                  Пользователь 
-                  id: ${queryUser.id}
-                  Инициалы: ${queryUser.surname} ${queryUser.name} 
-                  запросил отчёт писателей на клиенте в ${new Date()}
-                `)
+    Пользователь 
+    id: ${queryUser.id}
+    Инициалы: ${queryUser.surname} ${queryUser.name} 
+    запросил отчёт писателей на клиенте в ${new Date()}
+  `)
   return res.end(
     JSON.stringify(writters)
   )
 })
 
+app.post('/api/admin/:login', async (req, res) => {
+  await Admins.findOne({
+    where: {
+      login: req.body.Login,
+      password: req.body.Password
+    }
+  }).then(() => {
+    return res.end('true')
+  })
+  return res.end('false')
+})
+
 app.post('/api/login', async (req, res) => {
   writeToFileLog(`
-                  Пользователь 
-                  id: 
-                  Инициалы: ${req.body.Login} 
-                  запросил вход на клиенте в ${new Date()}
-                `)
-  if (req.body.Role == 'Читатель') {
-    let response = await checkReader(
-      req.body.Login, req.body.Password
-    )
-    return res.end(res.fatal != true ? res.end(JSON.stringify(response)) : "error")
-  }
-  else if (req.body.Role == 'Писатель') {
-    let response = await checkWriter(
-      req.body.Login, req.body.Password
-    )
-    return res.end(res.fatal != true ? res.end(JSON.stringify(response)) : "error")
-  }
-  else if (req.body.Role == 'Инвестор') {
-    let response = await checkOffer(
-      req.body.Login, req.body.Password
-    )
-    return res.end(res.fatal != true ? res.end(JSON.stringify(response)) : "error")
+    Пользователь 
+    id: 
+    Инициалы: ${req.body.Login} 
+    запросил вход на клиенте в ${new Date()}
+  `)
+  let response = await validateUser(req.body)
+  if(response.confirm == false) {
+    return res.end('Почта не подтверждена')
+  } else if(response.duplicate) {
+    return res.end('Доступ запрещён')
+  } else 
+    if (response.confirm) {
+      return res.end(JSON.stringify(response))
   }
   return res.end('not found')
 })
@@ -154,103 +159,65 @@ app.get('/api/confirm/:role/:id', async (req, res) => {
   } else {
     return res.send('Ссылка недействительна')
   }
-  user.confirm = true
-  user.save()
+  if (new Date().getHours() - user.createdAt.getHours() <= 5) {
+    user.confirm = true
+    user.save()
+  } else {
+    return res.send('Срок действия ссылки истёк')
+  }
   writeToFileLog(`
-                  Пользователь 
-                  id: ${user.id}
-                  Инициалы: ${user.surname} ${user.name} 
-                  запросил подтверждение регистрации в ${new Date()}
-                `)
+    Пользователь 
+    id: ${user.id}
+    Инициалы: ${user.surname} ${user.name} 
+    запросил подтверждение регистрации в ${new Date()}
+  `)
   return res.sendFile(__dirname + '/index.html')
 })
 
 app.post('/api/registration', async (req, res) => {
   writeToFileLog(`
-                  Пользователь 
-                  id: ${req.body.Login}
-                  Инициалы: ${req.body.surname} ${req.body.name} 
-                  запросил регистрацию на клиенте в ${new Date()}
-                `)
-  if (req.body.Role == 'Читатель') {
-    let user = await Readers.create({
-      login: req.body.Login,
-      password: req.body.Password,
-      name: req.body.Name,
-      surname: req.body.Surname,
-      email: req.body.Email,
-      secret_code: req.body.SecretCode,
-    }).catch(() => {
-      return res.end('error database')
-    })
-    let IsMail = await mailSend(
-      user.id,
-      uri,
-      user.email,
-      req.body.Role
-    )
-    if (IsMail) {
-      return res.end(
-        JSON.stringify(user)
-      )
-    } else {
-      await user.destroy();
-      return res.end('error mail')
-    }
+    Пользователь 
+    id: ${req.body.Login}
+    Инициалы: ${req.body.surname} ${req.body.name} 
+    запросил регистрацию на клиенте в ${new Date()}
+  `)
+  let listblockstr = await blockedDublicate(
+    req.body.Login,
+    req.body.Email, 
+    req.body.Role
+  )
+  let user = await createUser(
+    req.body
+  )
+  IsMail = await mailSend(
+    user.id,
+    uri,
+    user.email,
+    req.body.Role,
+    listblockstr
+  )
+  if (
+    listblockstr == errorDB ||
+    user == errorDB
+  ) {
+    return res.end(errorDB)
   }
-  else if (req.body.Role == 'Писатель') {
-    let user = await Writters.create({
-      login: req.body.Login,
-      password: req.body.Password,
-      name: req.body.Name,
-      surname: req.body.Surname,
-      email: req.body.Email,
-      secret_code: req.body.SecretCode,
-    }).catch(() => {
-      return res.end('error database')
-    })
-    let IsMail = await mailSend(
-      user.id,
-      uri,
-      user.email,
-      req.body.Role
-    )
-    if (IsMail) {
-      return res.end(
-        JSON.stringify(user)
-      )
-    } else {
-      await user.destroy();
-      return res.end('error mail')
+  if (IsMail) {
+    if (listblockstr) {
+      user.duplicate = true
+      user.save()
+      setTimeout(() => {
+        user.duplicate = false
+        user.save()
+      }, 1000 * 60 * 68 * 24)
     }
-  }
-  else if (req.body.Role == 'Инвестор') {
-    let user = await Offers.create({
-      login: req.body.Login,
-      password: req.body.Password,
-      name: req.body.Name,
-      surname: req.body.Surname,
-      email: req.body.Email,
-      secret_code: req.body.SecretCode,
-    }).catch(() => {
-      return res.end('error database')
-    })
-    let IsMail = await mailSend(
-      user.id,
-      uri,
-      user.email,
-      req.body.Role
+    return res.end(
+      JSON.stringify(user)
     )
-    if (IsMail) {
-      return res.end(
-        JSON.stringify(user)
-      )
-    } else {
-      await user.destroy();
-      return res.end('error mail')
-    }
+  } else {
+    await user.destroy();
+    return res.end('Ошибка отправки сообщения на почту')
   }
-  return res.end('Fail registration')
 })
 
 app.get('/api/books/:id/:role', async (req, res) => {
@@ -281,11 +248,11 @@ app.get('/api/books/:id/:role', async (req, res) => {
     })
   }
   writeToFileLog(`
-                  Пользователь 
-                  id: ${queryUser.id}
-                  Инициалы: ${queryUser.surname} ${queryUser.name} 
-                  запросил список книг на клиенте в ${new Date()}
-                `)
+    Пользователь 
+    id: ${queryUser.id}
+    Инициалы: ${queryUser.surname} ${queryUser.name} 
+    запросил список книг на клиенте в ${new Date()}
+  `)
   let newFormBooks = []
   let books = await Compositions.findAll({
     attributes: [
@@ -375,11 +342,11 @@ app.get('/api/writters/list/:id/:role', async (req, res) => {
     })
   }
   writeToFileLog(`
-                  Пользователь 
-                  id: ${queryUser.id}
-                  Инициалы: ${queryUser.surname} ${queryUser.name} 
-                  запросил список писателей на клиенте ${new Date()}
-                `)
+    Пользователь 
+    id: ${queryUser.id}
+    Инициалы: ${queryUser.surname} ${queryUser.name} 
+    запросил список писателей на клиенте ${new Date()}
+  `)
   await Writters.findAll({
     attributes: [
       'id',
@@ -421,11 +388,11 @@ app.get('/api/text/book/:id/:iduser/:role', async (req, res) => {
     })
   }
   writeToFileLog(`
-                  Пользователь 
-                  id: ${queryUser.id}
-                  Инициалы: ${queryUser.surname} ${queryUser.name} 
-                  запросил книгу на клиенте в ${new Date()}
-                `)
+    Пользователь 
+    id: ${queryUser.id}
+    Инициалы: ${queryUser.surname} ${queryUser.name} 
+    запросил книгу на клиенте в ${new Date()}
+  `)
   await Compositions.findOne({
     where: {
       id: req.params.id
@@ -448,79 +415,6 @@ app
     console.log(chalk.green(`[server] server start `))
     console.log(chalk.bold.blueBright(`_`.repeat(48)))
 });
-
-// Проверка на данные
-async function checkReader(login, password) {
-  let user = await Readers.findOne({
-    where: {
-      login: login,
-      password: password,
-    },
-    attributes: [
-      'id', 'name',
-      'surname', 'email',
-      'date_of_born', 'confirm'
-    ]
-  }).catch(() => {
-    return 'error'
-  })
-  if (user) {
-    if (user.confirm != 0) {
-      user.confirm = undefined
-      return user
-    }
-    return 'not confirm'
-  }
-  return 'not found'
-}
-
-async function checkWriter(login, password) {
-  let user = await Writters.findOne({
-    where: {
-      login: login,
-      password: password,
-    },
-    attributes: [
-      'id', 'name',
-      'surname', 'email',
-      'work_experience', 'confirm'
-    ]
-  }).catch(() => {
-    return 'error'
-  })
-  if (user) {
-    if (user.confirm != 0) {
-      user.confirm = undefined
-      return user
-    }
-    return 'not confirm'
-  }
-  return 'not found'
-}
-
-async function checkOffer(login, password) {
-  let user = await Offers.findOne({
-    where: {
-      login: login,
-      password: password,
-    },
-    attributes: [
-      'id', 'name',
-      'surname', 'email',
-      'note', 'confirm'
-    ]
-  }).catch(() => {
-    return 'error'
-  })
-  if (user) {
-    if (user.confirm != 0) {
-      user.confirm = undefined
-      return user
-    }
-    return 'not confirm'
-  }
-  return 'not found'
-}
 
 // Ассоциации Базы Данных
 function associationsDB() {
@@ -620,7 +514,7 @@ function associationsDB() {
 }
 
 // отправка письма подтверждения профиля
-async function mailSend(id, uri, mail, role) {
+async function mailSend(id, uri, mail, role, duplicatestr) {
   // Generate test SMTP service account from ethereal.email
   // Only needed if you don't have a real mail account for testing
   // let testAccount = await nodemailer.createTestAccount();
@@ -637,14 +531,23 @@ async function mailSend(id, uri, mail, role) {
   });
 
   // send mail with defined transport object
-  let info;
+  let info = ''
+  if (duplicatestr.indexOf('mail') > -1) {
+    info += ' У вас повторяется email.'
+  }
+  if (duplicatestr.indexOf('login') > -1) {
+    info += ' У вас повторяется логин.'
+  }
+  let infoblock = 'Учетная запись недоступна в течение 24 часов.'
   try {
     info = await transporter.sendMail({
-      from: '"RWO " <yatest2021@mail.ru>', // sender address
-      to: mail, // list of receivers
-      subject: "Hello, u r confirm ur profile ✔", // Subject line
-      // text: ``, // plain text body
-      html: `<a href="${uri}/api/confirm/${role}/${id}">Click for open app</a>`, // html body
+    from: '"RWO " <yatest2021@mail.ru>', // sender address
+    to: mail, // list of receivers
+    subject: "Hello,confirm ur profile, pls! ✔", // Subject line
+    // text: ``, // plain text body
+    html: `<a href="${uri}/api/confirm/${role}/${id}">
+    Кликните по тексту, чтобы подтвердить почту и открыть приложение.
+    </a> ${info != '' ? info + infoblock: ''}`, // html body
     })
   } catch (error) {
     return false
@@ -696,4 +599,138 @@ function createReportFile(listXML, user, nameList) {
     if(err) throw err;
   })
   return path
+}
+
+async function blockedDublicate(login, email, role) {
+  try {
+    let duplicate = ''
+    let DuplicateOfferEmail = null
+    let DuplicateOfferLogin = null
+    if (role == "Инвестор") {
+      DuplicateOfferEmail = await Offers.findOne({
+        where: {
+          email: email
+        }
+      })
+      DuplicateOfferLogin = await Offers.findOne({
+        where: {
+          login: login
+        }
+      })
+    } else if (role == "Читатель") {
+      DuplicateOfferEmail = await Readers.findOne({
+        where: {
+          email: email
+        }
+      })
+      DuplicateOfferLogin = await Readers.findOne({
+        where: {
+          login: login
+        }
+      })
+    } else if (role == "Писатель") {
+      DuplicateOfferEmail = await Writters.findOne({
+        where: {
+          email: email
+        }
+      })
+      DuplicateOfferLogin = await Writters.findOne({
+        where: {
+          login: login
+        }
+      })
+    }
+    if (DuplicateOfferEmail) {
+      duplicate += ' mail'
+      DuplicateOfferEmail.duplicate = true
+      DuplicateOfferEmail.save()
+    }
+    if (DuplicateOfferLogin) {
+      duplicate += ' login'
+      DuplicateOfferLogin.duplicate = true
+      DuplicateOfferLogin.save()
+    }
+    if (duplicate != '') {
+      setTimeout(() => {
+        user.confirm = false
+        user.save()
+      }, 1000 * 60 * 60 * 24)
+    }
+    return duplicate
+  } catch (error) {
+    return errorDB
+  }
+}
+
+async function createUser(jsonUser) {
+  try {
+    let loremUser = {
+      login: jsonUser.Login,
+      password: jsonUser.Password,
+      name: jsonUser.Name,
+      surname: jsonUser.Surname,
+      email: jsonUser.Email,
+      secret_code: jsonUser.SecretCode,
+    }
+    if (jsonUser.Role == 'Читатель') {
+      return await Readers.create(loremUser)
+    }
+    else if (jsonUser.Role == 'Писатель') {
+      return await Writters.create(loremUser)
+    }
+    else if (jsonUser.Role == 'Инвестор') {
+      return await Offers.create(loremUser)
+    }
+  } catch (error) {
+    return errorDB
+  }
+}
+
+async function validateUser(user) {
+  try {
+    let response
+    if (user.Role == 'Читатель') {
+      response = await Readers.findOne({
+        where: {
+          login: user.Login,
+          password: user.Password
+        },
+        attributes: [
+          'id', 'name',
+          'surname', 'email',
+          'date_of_born', 'confirm',
+          'duplicate'
+        ]
+      })
+    } else if (user.Role == 'Писатель') {
+      response = await Writters.findOne({
+        where: {
+          login: user.Login,
+          password: user.Password
+        },
+        attributes: [
+          'id', 'name',
+          'surname', 'email',
+          'work_experience', 'confirm',
+          'duplicate'
+        ]
+      })
+    } else if (user.Role == 'Инвестор') {
+      response = await Offers.findOne({
+        where: {
+          login: user.Login,
+          password: user.Password
+        },
+        attributes: [
+          'id', 'name',
+          'surname', 'email',
+          'note', 'confirm',
+          'duplicate'
+        ]
+      })
+    }
+    return response
+  } catch (error) {
+    return errorDB
+  }
 }
