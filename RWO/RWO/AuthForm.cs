@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
 using System.Linq;
+using System.Drawing;
+using System.Collections.Generic;
 
 namespace RWO
 {
@@ -13,9 +15,137 @@ namespace RWO
         RegistForm RegForm;
         HttpListener listener = new HttpListener();
         Task listenposttask;
+        List<DateTime> unSuccessLogins = new List<DateTime>();
+        string text;
+        int incorrectCapcha = 0;
+        int capchaUpdates = 0;
         public AuthForm()
         {
             InitializeComponent();
+            Captcha.Image = CreateImage(Captcha.Width, Captcha.Height);
+        }
+
+        private Image CreateImage(int Width, int Height)
+        {
+            Random rnd = new Random();
+
+            //Создадим изображение
+            Bitmap result = new Bitmap(Width, Height);
+
+            //Вычислим позицию текста
+            int Xpos = rnd.Next(10);
+            int Ypos = rnd.Next(10);
+
+            //Добавим различные цвета ддя текста
+            Brush[] colors =
+            {
+                Brushes.Black,
+                Brushes.DarkRed,
+                Brushes.DarkBlue,
+                Brushes.DarkGreen,
+                Brushes.DarkOrange
+            };
+
+            //Добавим различные цвета линий
+            Pen[] colorpens = {
+                Pens.White,
+                Pens.Tomato,
+                Pens.Sienna,
+                Pens.Pink,
+                Pens.AliceBlue};
+
+            Color[] BgColor =
+            {
+                Color.Aqua,
+                Color.Aquamarine,
+                Color.Azure,
+                Color.Blue,
+                Color.Bisque,
+                Color.BlueViolet,
+                Color.LightBlue,
+                Color.LightGreen,
+                Color.LightPink,
+                Color.LightGray,
+                Color.LightSalmon,
+                Color.LightSeaGreen,
+                Color.LightSkyBlue,
+                Color.LightSlateGray,
+                Color.LightYellow
+            };
+
+            //Делаем случайный стиль текста
+            FontStyle[] fontstyle =
+            {
+                FontStyle.Bold,
+                FontStyle.Italic,
+                FontStyle.Regular,
+                FontStyle.Strikeout,
+                FontStyle.Underline
+            };
+
+            //Добавим различные углы поворота текста
+            Int16[] rotate = { 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6 };
+
+            //Укажем где рисовать
+            Graphics g = Graphics.FromImage((Image)result);
+
+            //Пусть фон картинки будет серым
+            g.Clear(BgColor[rnd.Next(BgColor.Length)]);
+
+            //Делаем случайный угол поворота текста
+            g.RotateTransform(rnd.Next(rotate.Length));
+
+            //Генерируем текст
+            text = "";
+            text += rnd.Next(9);
+            string ALF = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
+            for (int i = 0; i < rnd.Next(5, 10); ++i)
+                text += ALF[rnd.Next(ALF.Length)];
+
+            //Нарисуем сгенирируемый текст
+            g.DrawString(text,
+            new Font("Arial", 14, fontstyle[rnd.Next(fontstyle.Length)]),
+            colors[rnd.Next(colors.Length)],
+            new PointF(Xpos, Ypos));
+
+            //Добавим немного помех
+            //Линии из углов
+            g.DrawLine(colorpens[rnd.Next(colorpens.Length)],
+            new Point(0, rnd.Next(Height - 1)),
+            new Point(Width - 1, rnd.Next(Height - 1)));
+            g.DrawLine(colorpens[rnd.Next(colorpens.Length)],
+            new Point(0, rnd.Next(Height - 1)),
+            new Point(Width - 1, rnd.Next(Height - 1)));
+            g.DrawLine(colorpens[rnd.Next(colorpens.Length)],
+            new Point(0, rnd.Next(Height - 1)),
+            new Point(Width - 1, rnd.Next(Height - 1)));
+
+            //Белый шум
+            for (int i = 0; i < Width; ++i)
+                for (int j = 0; j < Height; ++j)
+                    if (rnd.Next() % 20 == 0)
+                        result.SetPixel(i, j, Color.White);
+
+            return result;
+        }
+
+        private void MakeCapcha()
+        {
+            if (LoginBox.Text != "" && PassBox.Text != "" && RoleCombo.SelectedIndex != -1)
+            {
+                LoginBox.Enabled = false;
+                PassBox.Enabled = false;
+                RoleCombo.Enabled = false;
+                Captcha.Visible = true;
+                CaptchaBox.Visible = true;
+                UpdCaptcha.Visible = true;
+                CheckCaptcha.Visible = true;
+                LoginBtn.Enabled = false;
+                Captcha.Image = CreateImage(Captcha.Width, Captcha.Height);
+            }
+            else
+                MessageBox.Show("Имя пользователя или пароль не могут быть пустыми",
+                        "Проверьте заполнение полей", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
         private void BtnToRegistForm_Click(object sender, EventArgs e)
@@ -31,7 +161,7 @@ namespace RWO
         private void LoginBtn_Click(object sender, EventArgs e)
         {
             DBConnection API = new DBConnection();
-            if (ValidateData())
+            if (ValidateData() && incorrectCapcha < 7 && capchaUpdates < 15)
             {
                 ValidateUser UserLogining = new ValidateUser(
                         LoginBox.Text, PassBox.Text, RoleCombo.Text
@@ -66,6 +196,20 @@ namespace RWO
                             {
                                 MsgBoxError(res, "Неизвестная ошибка");
                             }
+                            unSuccessLogins.Add(DateTime.Now);
+                            int count = 0;
+                            foreach (var dt in unSuccessLogins)
+                            {
+                                if ((DateTime.Now - dt).TotalHours < 1)
+                                    count++;
+                            }
+                            if (count >= 5)
+                                Invoke(
+                                        (MethodInvoker)delegate
+                                        {
+                                            MakeCapcha();
+                                        }
+                                    );
                         }
                     ).Start();
             } 
@@ -78,7 +222,7 @@ namespace RWO
                 string IsAdmin = API.PostJson("/api/admin/" + LoginBox.Text, JsonUserLogining);
                 if (IsAdmin == "true")
                 {
-                    AdminForm AP = new AdminForm();
+                    AdminForm AP = new AdminForm(this);
                     AP.Show();
                     Hide();
                 }
@@ -205,6 +349,48 @@ namespace RWO
         {
             LoginBox.Text = "admin";
             PassBox.Text = "admin";
+        }
+
+        private void UpdCaptcha_Click(object sender, EventArgs e)
+        {
+            if (capchaUpdates >= 15)
+            {
+                var API = new DBConnection();
+                API.GetJSON("/api/incorrect/captcha/" + LoginBox.Text + "/" + RoleCombo.Text);
+                MsgBoxError("На Ваш email отправлено письмо для смены пароля", "Учётная запись заблокирована");
+                Close();
+            }
+            else
+            {
+                Captcha.Image = CreateImage(Captcha.Width, Captcha.Height);
+                capchaUpdates++;
+            }
+        }
+
+        private void CheckCaptcha_Click(object sender, EventArgs e)
+        {
+            if (CaptchaBox.Text == text)
+            {
+                LoginBox.Enabled = true;
+                PassBox.Enabled = true;
+                RoleCombo.Enabled = true;
+                Captcha.Visible = false;
+                CaptchaBox.Visible = false;
+                UpdCaptcha.Visible = false;
+                LoginBtn.Enabled = true;
+            }
+            else
+            {
+                MessageBox.Show("Капча введена неверно", "Капча введена неверно", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                incorrectCapcha++;
+                if (incorrectCapcha >= 15)
+                {
+                    DBConnection API = new DBConnection();
+                    API.GetJSON("/api/incorrect/captcha/" + LoginBox.Text + "/" + RoleCombo.Text);
+                    MessageBox.Show("На Ваш email отправлено письмо для смены пароля", "Учётная запись заблокирована", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Close();
+                }
+            }
         }
     }
 }

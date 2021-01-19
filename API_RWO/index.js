@@ -62,6 +62,42 @@ app.get('/', (req, res) => {
   return res.send('<a href="http://176.100.0.104:3001/Debug.rar" targer="_blank">Скачать файл</a>')
 })
 
+app.get('/admin/validate/import/:email/:login', async (req, res) => {
+  let whatNotUnique = '{}'
+  let adminEmail = await Admins.findOne({
+    where: {
+      email: req.params.email
+    }
+  })
+  if (adminEmail) {
+    whatNotUnique += 'email'
+  }
+  let adminLogin = await Admins.findOne({
+    where: {
+      login: req.params.login
+    }
+  })
+  if (adminLogin) {
+    whatNotUnique += 'login'
+  }
+  if (whatNotUnique == '{}') {
+    whatNotUnique = '{}unique'
+  }
+  return res.end(whatNotUnique)
+})
+
+app.post('/admin/registr/admins', async (req, res) => {
+  let newAdmin = Admins.create({
+    login: req.body.login,
+    email: req.body.email,
+    password: req.body.password,
+    surname: req.body.surname
+  })
+  if (newAdmin) {
+    return res.end('Админ добавлен')
+  }
+})
+
 app.get('/api/report/create/writters/:id/:role', async (req, res) => {
   let queryUser;
   if (req.params.role == 'Инвестор') {
@@ -118,15 +154,17 @@ app.post('/api/login', async (req, res) => {
     запросил вход на клиенте в ${new Date()}
   `)
   let response = await validateUser(req.body)
-  if(response.confirm == false) {
-    return res.end('Почта не подтверждена')
-  } else if(response.duplicate) {
-    return res.end('Доступ запрещён')
-  } else 
-    if (response.confirm) {
-      return res.end(JSON.stringify(response))
+  if (response) {
+    if(response.confirm == false) {
+      return res.end('Почта не подтверждена')
+    } else if(response.duplicate) {
+      return res.end('Доступ запрещён')
+    } else 
+      if (response.confirm) {
+        return res.end(JSON.stringify(response))
+    }
   }
-  return res.end('not found')
+  return res.end('Неверный логин или пароль')
 })
 
 

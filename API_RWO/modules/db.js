@@ -8,7 +8,7 @@ let readers = {
     allowNull: false
   },
   login: {
-    type: Sequelize.STRING(16),
+    type: Sequelize.STRING(32),
     allowNull: false
   },
   password: {
@@ -85,7 +85,7 @@ let writters = {
     allowNull: false
   },
   login: {
-    type: Sequelize.STRING(16),
+    type: Sequelize.STRING(32),
     allowNull: false
   },
   password: {
@@ -132,7 +132,7 @@ let offers = {
     allowNull: false
   },
   login: {
-    type: Sequelize.STRING(16),
+    type: Sequelize.STRING(32),
     allowNull: false
   },
   password: {
@@ -226,6 +226,10 @@ let admins = {
     primaryKey: true,
     allowNull: false
   },
+  surname: {
+    type: Sequelize.STRING(32),
+    allowNull: false
+  },
   login: {
     type: Sequelize.STRING(32),
     allowNull: false
@@ -238,7 +242,6 @@ let admins = {
     type: Sequelize.STRING(32),
     allowNull: false
   }, 
-
 }
 
 let reports = {

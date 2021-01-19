@@ -50,6 +50,7 @@ namespace RWO
             this.Controls.Add(this.ImportAdmin);
             this.Name = "AdminForm";
             this.Text = "AdminForm";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AdminForm_FormClosing);
             this.ResumeLayout(false);
 
         }

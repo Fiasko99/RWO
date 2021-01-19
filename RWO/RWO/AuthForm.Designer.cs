@@ -40,6 +40,11 @@ namespace RWO
             this.RoleCombo = new System.Windows.Forms.ComboBox();
             this.RoleLabel = new System.Windows.Forms.Label();
             this.RememberLogin = new System.Windows.Forms.CheckBox();
+            this.Captcha = new System.Windows.Forms.PictureBox();
+            this.CaptchaBox = new System.Windows.Forms.TextBox();
+            this.UpdCaptcha = new System.Windows.Forms.Button();
+            this.CheckCaptcha = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.Captcha)).BeginInit();
             this.SuspendLayout();
             // 
             // WelcomeLabel
@@ -154,11 +159,54 @@ namespace RWO
             this.RememberLogin.Text = "Запомнить";
             this.RememberLogin.UseVisualStyleBackColor = true;
             // 
+            // Captcha
+            // 
+            this.Captcha.Location = new System.Drawing.Point(12, 280);
+            this.Captcha.Name = "Captcha";
+            this.Captcha.Size = new System.Drawing.Size(100, 50);
+            this.Captcha.TabIndex = 20;
+            this.Captcha.TabStop = false;
+            this.Captcha.Visible = false;
+            // 
+            // CaptchaBox
+            // 
+            this.CaptchaBox.Location = new System.Drawing.Point(118, 280);
+            this.CaptchaBox.Name = "CaptchaBox";
+            this.CaptchaBox.Size = new System.Drawing.Size(540, 35);
+            this.CaptchaBox.TabIndex = 21;
+            this.CaptchaBox.Visible = false;
+            // 
+            // UpdCaptcha
+            // 
+            this.UpdCaptcha.Location = new System.Drawing.Point(118, 321);
+            this.UpdCaptcha.Name = "UpdCaptcha";
+            this.UpdCaptcha.Size = new System.Drawing.Size(270, 35);
+            this.UpdCaptcha.TabIndex = 22;
+            this.UpdCaptcha.Text = "Обновить";
+            this.UpdCaptcha.UseVisualStyleBackColor = true;
+            this.UpdCaptcha.Visible = false;
+            this.UpdCaptcha.Click += new System.EventHandler(this.UpdCaptcha_Click);
+            // 
+            // CheckCaptcha
+            // 
+            this.CheckCaptcha.Location = new System.Drawing.Point(394, 321);
+            this.CheckCaptcha.Name = "CheckCaptcha";
+            this.CheckCaptcha.Size = new System.Drawing.Size(264, 35);
+            this.CheckCaptcha.TabIndex = 23;
+            this.CheckCaptcha.Text = "Проверить";
+            this.CheckCaptcha.UseVisualStyleBackColor = true;
+            this.CheckCaptcha.Visible = false;
+            this.CheckCaptcha.Click += new System.EventHandler(this.CheckCaptcha_Click);
+            // 
             // AuthForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 30F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(677, 283);
+            this.ClientSize = new System.Drawing.Size(677, 364);
+            this.Controls.Add(this.CheckCaptcha);
+            this.Controls.Add(this.UpdCaptcha);
+            this.Controls.Add(this.CaptchaBox);
+            this.Controls.Add(this.Captcha);
             this.Controls.Add(this.RememberLogin);
             this.Controls.Add(this.RoleLabel);
             this.Controls.Add(this.RoleCombo);
@@ -176,6 +224,7 @@ namespace RWO
             this.Text = "Auth";
             this.Load += new System.EventHandler(this.AuthForm_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.AuthForm_Paint);
+            ((System.ComponentModel.ISupportInitialize)(this.Captcha)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -194,5 +243,9 @@ namespace RWO
         private System.Windows.Forms.ComboBox RoleCombo;
         private System.Windows.Forms.Label RoleLabel;
         private System.Windows.Forms.CheckBox RememberLogin;
+        private System.Windows.Forms.PictureBox Captcha;
+        private System.Windows.Forms.TextBox CaptchaBox;
+        private System.Windows.Forms.Button UpdCaptcha;
+        private System.Windows.Forms.Button CheckCaptcha;
     }
 }
