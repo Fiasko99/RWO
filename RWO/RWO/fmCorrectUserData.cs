@@ -14,7 +14,6 @@ namespace RWO
     public partial class fmCorrectUserData : Form
     {
         public List<Admin> Users { get; private set; }
-        public int IdRole;
         public AdminForm Adminform;
         public fmCorrectUserData(string surname, string email, string password, string login, AdminForm adminForm)
         {

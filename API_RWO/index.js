@@ -146,6 +146,8 @@ app.post('/api/admin/:login', async (req, res) => {
   return res.end('false')
 })
 
+// app.get(/api/incorrect/captcha/)
+
 app.post('/api/login', async (req, res) => {
   writeToFileLog(`
     Пользователь 

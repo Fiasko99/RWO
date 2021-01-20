@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="RWO.Admin">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAEAAAAAAAAAAAAAAAAAgAAEAA=</HashCode>
+      <FileName>AdminForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.AuthForm">
+    <Position X="3.75" Y="0.5" Width="2" />
+    <Members>
+      <Method Name="AuthForm" Hidden="true" />
+      <Method Name="AuthForm_Load" Hidden="true" />
+      <Method Name="AuthForm_Paint" Hidden="true" />
+      <Field Name="BtnToRegistForm" Hidden="true" />
+      <Field Name="capchaUpdates" Hidden="true" />
+      <Field Name="CaptchaBox" Hidden="true" />
+      <Field Name="CheckCaptcha" Hidden="true" />
+      <Method Name="CheckResult" Hidden="true" />
+      <Field Name="components" Hidden="true" />
+      <Method Name="CreateImage" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Field Name="incorrectCapcha" Hidden="true" />
+      <Method Name="InitializeComponent" Hidden="true" />
+      <Field Name="listener" Hidden="true" />
+      <Method Name="ListenPort" Hidden="true" />
+      <Field Name="listenposttask" Hidden="true" />
+      <Method Name="LoginBox_TextChanged" Hidden="true" />
+      <Field Name="LoginBtn" Hidden="true" />
+      <Field Name="LoginLabel" Hidden="true" />
+      <Method Name="MsgBoxError" Hidden="true" />
+      <Method Name="MsgBoxWrong" Hidden="true" />
+      <Method Name="PassBox_TextChanged" Hidden="true" />
+      <Field Name="PassLabel" Hidden="true" />
+      <Field Name="RegForm" Hidden="true" />
+      <Field Name="RememberLogin" Hidden="true" />
+      <Field Name="RePassBtn" Hidden="true" />
+      <Field Name="RoleLabel" Hidden="true" />
+      <Method Name="StepAuth" Hidden="true" />
+      <Field Name="text" Hidden="true" />
+      <Field Name="unSuccessLogins" Hidden="true" />
+      <Field Name="UpdCaptcha" Hidden="true" />
+      <Method Name="UpdCaptcha_Click" Hidden="true" />
+      <Field Name="WelcomeLabel" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AYCAEAAGACgAAAAIgASCBEACkI0AAAEosEBgIJAAYAo=</HashCode>
+      <FileName>AuthForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.Content">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <Members>
+      <Field Name="auth" Hidden="true" />
+      <Field Name="books" Hidden="true" />
+      <Field Name="BtnPageLast" Hidden="true" />
+      <Method Name="BtnPageLast_Click" Hidden="true" />
+      <Field Name="BtnPageOne" Hidden="true" />
+      <Method Name="BtnPageOne_Click" Hidden="true" />
+      <Field Name="BtnToProfileForm" Hidden="true" />
+      <Field Name="CaptionCountBookLabel" Hidden="true" />
+      <Field Name="ComboAgeLimits" Hidden="true" />
+      <Method Name="ComboAgeLimits_SelectionChangeCommitted" Hidden="true" />
+      <Field Name="ComboGenres" Hidden="true" />
+      <Method Name="ComboGenres_SelectionChangeCommitted" Hidden="true" />
+      <Field Name="ComboLang" Hidden="true" />
+      <Method Name="ComboLang_SelectionChangeCommitted" Hidden="true" />
+      <Field Name="ComboWritters" Hidden="true" />
+      <Method Name="ComboWritters_SelectionChangeCommitted" Hidden="true" />
+      <Field Name="components" Hidden="true" />
+      <Method Name="Content" Hidden="true" />
+      <Method Name="Content_FormClosing" Hidden="true" />
+      <Field Name="ContentListView" Hidden="true" />
+      <Method Name="ContentListView_DrawColumnHeader" Hidden="true" />
+      <Method Name="ContentListView_DrawItem" Hidden="true" />
+      <Field Name="CountBooks" Hidden="true" />
+      <Method Name="CountBooks_SelectedIndexChanged" Hidden="true" />
+      <Method Name="CountBooksStep" Hidden="true" />
+      <Field Name="countbooksvalue" Hidden="true" />
+      <Method Name="DeleteItem_Click" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="DownLoadItem_Click" Hidden="true" />
+      <Field Name="ExitProfile" Hidden="true" />
+      <Method Name="ExitProfile_Click" Hidden="true" />
+      <Field Name="FilterAgeLimits" Hidden="true" />
+      <Field Name="FilterGenres" Hidden="true" />
+      <Field Name="FilterLanguages" Hidden="true" />
+      <Method Name="FilterOfComboName" Hidden="true" />
+      <Method Name="FilterProcess" Hidden="true" />
+      <Field Name="FilterWritters" Hidden="true" />
+      <Method Name="InitializeComponent" Hidden="true" />
+      <Field Name="NextPage" Hidden="true" />
+      <Method Name="NextPage_Click" Hidden="true" />
+      <Field Name="NumberPage" Hidden="true" />
+      <Field Name="OnLoadBook" Hidden="true" />
+      <Method Name="OnLoadBook_Click" Hidden="true" />
+      <Field Name="PreviousPage" Hidden="true" />
+      <Method Name="PreviousPage_Click" Hidden="true" />
+      <Field Name="SelectBookMenu" Hidden="true" />
+      <Method Name="SelectValueForFilters" Hidden="true" />
+      <Field Name="ShowReadBook" Hidden="true" />
+      <Method Name="ShowReadBook_Click" Hidden="true" />
+      <Method Name="TableFormatForListView" Hidden="true" />
+      <Field Name="UserInfo" Hidden="true" />
+      <Field Name="WrittersList" Hidden="true" />
+      <Method Name="WrittersList_Click" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AMCIIEUITGAkAERAgJLAIErCDAAYgRAwEQQRkEACHAA=</HashCode>
+      <FileName>Content.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.Book">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <Members>
+      <Method Name="Book" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAgCAAAAAAACAAAAAAAAAAABAAAEAgA=</HashCode>
+      <FileName>Content.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.AdminForm">
+    <Position X="11.25" Y="0.5" Width="2.25" />
+    <Members>
+      <Field Name="components" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Field Name="ImportAdmin" Hidden="true" />
+      <Method Name="InitializeComponent" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAGAAAAAAAACAAAACgAAAAAAAAACAIBAAAAg=</HashCode>
+      <FileName>AdminForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.User">
+    <Position X="9.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAEAAAAAAAEAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>DBConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.UserReader">
+    <Position X="9.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DBConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.UserWritter">
+    <Position X="11.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DBConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.UserOffer">
+    <Position X="7.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DBConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.DBConnection">
+    <Position X="7.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAIACAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>DBConnection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.fmCorrectUserData">
+    <Position X="5.25" Y="4" Width="2.25" />
+    <Members>
+      <Field Name="AddAdminBtn" Hidden="true" />
+      <Field Name="components" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="InitializeComponent" Hidden="true" />
+      <Field Name="label1" Hidden="true" />
+      <Field Name="label2" Hidden="true" />
+      <Field Name="label3" Hidden="true" />
+      <Field Name="label4" Hidden="true" />
+      <Property Name="Users" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAACAACCAAABAAAACAAAACAAwAACAEAAAAVADAIAA=</HashCode>
+      <FileName>fmCorrectUserData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.RegistForm">
+    <Position X="13.75" Y="0.5" Width="1.75" />
+    <Members>
+      <Field Name="AddInfo" Hidden="true" />
+      <Field Name="BtnToAuthForm" Hidden="true" />
+      <Field Name="components" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Field Name="EmailLabel" Hidden="true" />
+      <Method Name="InitializeComponent" Hidden="true" />
+      <Field Name="LoginLabel" Hidden="true" />
+      <Field Name="NameLabel" Hidden="true" />
+      <Field Name="RegistrationBtn" Hidden="true" />
+      <Field Name="RoleLabel" Hidden="true" />
+      <Field Name="SecretLabel" Hidden="true" />
+      <Field Name="SurnameLabel" Hidden="true" />
+      <Field Name="WelcomeLabel" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>ALAQEAABACgEAAAAQACIAAACUIwCGgAAEAAgcABAwAA=</HashCode>
+      <FileName>RegistForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.ValidateUser">
+    <Position X="13.25" Y="5.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAACAAAAAAEAAAAAQABAAAAAACAAAQAAAAAAA=</HashCode>
+      <FileName>ValidateUser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.WritterProfile">
+    <Position X="1.5" Y="0.5" Width="2" />
+    <Members>
+      <Field Name="BackToWrittersListForm" Hidden="true" />
+      <Method Name="BackToWrittersListForm_Click" Hidden="true" />
+      <Field Name="components" Hidden="true" />
+      <Field Name="CountBooks" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Field Name="GetBooks" Hidden="true" />
+      <Field Name="GetWritterOffers" Hidden="true" />
+      <Method Name="InitializeComponent" Hidden="true" />
+      <Field Name="label1" Hidden="true" />
+      <Field Name="label2" Hidden="true" />
+      <Field Name="StayOffer" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>QACAICAAICAYABAAEACBAggCAAAEABAAAAAEAAAAAIA=</HashCode>
+      <FileName>WritterProfile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.WrittersListForm">
+    <Position X="1.5" Y="4.25" Width="1.75" />
+    <Members>
+      <Field Name="components" Hidden="true" />
+      <Field Name="countbooksvalue" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Field Name="FirstPage" Hidden="true" />
+      <Field Name="GetReport" Hidden="true" />
+      <Field Name="InfoLabel" Hidden="true" />
+      <Method Name="InitializeComponent" Hidden="true" />
+      <Field Name="LastBook" Hidden="true" />
+      <Field Name="LastPage" Hidden="true" />
+      <Field Name="NextPage" Hidden="true" />
+      <Field Name="PreviousPage" Hidden="true" />
+      <Field Name="UserInfo" Hidden="true" />
+      <Field Name="WrittersListView" Hidden="true" />
+      <Field Name="WrittersOnList" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>EEEIAQFAYmAEKACAAAiCAAKCDAAAAhAAABAAgBACBAA=</HashCode>
+      <FileName>WrittersListForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.Writter">
+    <Position X="11.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAEAAAAAAAAEAAAAAAAEAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>WrittersListForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RWO.FullWritterReports">
+    <Position X="3.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAgEAAEAAAAAAAEAAAAAAAAAAAAEgA=</HashCode>
+      <FileName>WrittersListForm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
