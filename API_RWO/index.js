@@ -230,9 +230,8 @@ app.post('/api/registration', async (req, res) => {
     req.body
   )
   IsMail = await mailSend(
-    user.id,
+    user,
     uri,
-    user.email,
     req.body.Role,
     listblockstr
   )
@@ -554,7 +553,7 @@ function associationsDB() {
 }
 
 // отправка письма подтверждения профиля
-async function mailSend(id, uri, mail, role, duplicatestr) {
+async function mailSend(user, uri, role, duplicatestr) {
   // Generate test SMTP service account from ethereal.email
   // Only needed if you don't have a real mail account for testing
   // let testAccount = await nodemailer.createTestAccount();
@@ -582,10 +581,10 @@ async function mailSend(id, uri, mail, role, duplicatestr) {
   try {
     info = await transporter.sendMail({
     from: '"RWO " <yatest2021@mail.ru>', // sender address
-    to: mail, // list of receivers
+    to: user.email, // list of receivers
     subject: "Hello,confirm ur profile, pls! ✔", // Subject line
     // text: ``, // plain text body
-    html: `<a href="${uri}/api/confirm/${role}/${id}">
+    html: `Приветствуем вас на на нашем сервисе, ${user.surname} ${user.name}. <a href="${uri}/api/confirm/${role}/${user.id}">
     Кликните по тексту, чтобы подтвердить почту и открыть приложение.
     </a> ${info != '' ? info + infoblock: ''}`, // html body
     })
