@@ -18,7 +18,6 @@ const {
   languages,
   genres, reports, admins
 } = require('./modules/db')
-const { resolve } = require('path')
 let PORT = process.env.PORT || 3001;
 let uri = `http://176.100.0.104:${PORT}`
 let errorDB = 'База данных отключена'
@@ -60,6 +59,10 @@ writeToFileLog('Сервер стартовал в ' + new Date() + '\n\n')
 // Запросы
 app.get('/', (req, res) => {
   return res.send('<a href="http://176.100.0.104:3001/Debug.rar" targer="_blank">Скачать файл</a>')
+})
+
+app.post('api/repass/:role/:login', async (req, res) => {
+
 })
 
 app.get('/admin/validate/import/:email/:login', async (req, res) => {
@@ -146,7 +149,48 @@ app.post('/api/admin/:login', async (req, res) => {
   return res.end('false')
 })
 
-// app.get(/api/incorrect/captcha/)
+app.get('/api/incorrect/captcha/:login/:role', async (req, res) => {
+  let user
+  if (req.params.role == 'Инвестор') {
+    user = await Offers.findOne({
+      where: {
+        login: req.params.login
+      }
+    }).catch(() => {
+      return res.send('Ошибка базы данных')
+    })
+  } else if (req.params.role == 'Читатель') {
+    user = await Readers.findOne({
+      where: {
+        login: req.params.login
+      }
+    }).catch(() => {
+      return res.send('Ошибка базы данных')
+    })
+  } else if (req.params.role == 'Писатель') {
+    user = await Writters.findOne({
+      where: {
+        login: req.params.login
+      }
+    }).catch(() => {
+      return res.send('Ошибка базы данных')
+    })
+  } else {
+    return res.send('Ссылка недействительна')
+  }
+  if (user) {
+    user.confirm = false
+    user.password = ''
+    user.save()
+    let mail = await RePassMailSend(user, req.params.role)
+    setTimeout(() => {
+      if (user.confirm != true) {
+        user.destroy()
+      }
+    }, 1000 * 60 * 60 * 12) // 12 hours
+  }
+  return res.end('block')
+})
 
 app.post('/api/login', async (req, res) => {
   writeToFileLog(`
@@ -552,6 +596,51 @@ function associationsDB() {
   })
 }
 
+
+async function RePassMailSend(userBlock, role) {
+  let transporter = nodemailer.createTransport({
+    host: "smtp.mail.ru",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: 'yatest2021@mail.ru', // generated ethereal user
+      pass: 'Qwerty_1234//', // generated ethereal password
+    },
+  });
+  let info = ''
+  try {
+    info = await transporter.sendMail({
+      from: '"RWO " <yatest2021@mail.ru>', // sender address
+      to: userBlock.email, // list of receivers
+      subject: "Hello,confirm ur profile, pls! ✔", // Subject line
+      // text: ``, // plain text body
+      html: `Приветствуем вас на на нашем сервисе, 
+      ${userBlock.surname} ${userBlock.name}. <a href="${uri}/api/repass/${role}/${userBlock.id}">
+      Нажмите, чтобы восстановить доступ к аккаунту и обновить пароль!
+      </a>`, // html body
+    })
+    return true
+  } catch (error) {
+    return false
+  }
+ 
+
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  // Preview only available when sending through an Ethereal account
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+  if (info.messageId) {
+    return true
+  }
+  return false
+}
+
+// Ведение журнала
+function writeToFileLog(text) {
+  fs.appendFile(__dirname + '/Logs.txt', text + "\r\n\n", (err) => {
+    console.log('Data add')
+    if(err) throw err;
+  })
+}
 // отправка письма подтверждения профиля
 async function mailSend(user, uri, role, duplicatestr) {
   // Generate test SMTP service account from ethereal.email

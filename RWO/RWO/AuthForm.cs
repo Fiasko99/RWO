@@ -330,21 +330,6 @@ namespace RWO
                     );
         }
 
-        private void LoginBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void PassBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void AuthForm_Paint(object sender, PaintEventArgs e)
-        {
-            
-        }
-
         private void AuthForm_Load(object sender, EventArgs e)
         {
             LoginBox.Text = "admin";
@@ -356,8 +341,11 @@ namespace RWO
             if (capchaUpdates >= 15)
             {
                 var API = new DBConnection();
-                API.GetJSON("/api/incorrect/captcha/" + LoginBox.Text + "/" + RoleCombo.Text);
-                MsgBoxError("На Ваш email отправлено письмо для смены пароля", "Учётная запись заблокирована");
+                string answer = API.GetJSON("/api/incorrect/captcha/" + LoginBox.Text + "/" + RoleCombo.Text);
+                if (answer.Length > 0)
+                {
+                    MsgBoxError("На Ваш email отправлено письмо для смены пароля", "Учётная запись заблокирована");
+                }
                 Close();
             }
             else

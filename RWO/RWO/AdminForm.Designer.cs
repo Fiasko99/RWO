@@ -40,7 +40,7 @@ namespace RWO
             this.ImportAdmin.TabIndex = 0;
             this.ImportAdmin.Text = "Импортировать админов";
             this.ImportAdmin.UseVisualStyleBackColor = true;
-            this.ImportAdmin.Click += new System.EventHandler(this.ReadersReport_Click);
+            this.ImportAdmin.Click += new System.EventHandler(this.ImportAdmin_Click);
             // 
             // AdminForm
             // 

@@ -23,29 +23,6 @@ namespace RWO
             Auth = auth;
         }
 
-        private void ReadersReport_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                Stream file = ofd.OpenFile();
-                string fileContent = null;
-                var srcEncoding = Encoding.GetEncoding(1251);
-                using (StreamReader reader = new StreamReader(file, encoding: srcEncoding))
-                {
-                    fileContent = reader.ReadToEnd();
-                }
-                if (fileContent != null && ofd.FileName.EndsWith("csv"))
-                {
-                    OpenCsv(fileContent);
-                } 
-                else if (fileContent != null && ofd.FileName.EndsWith("xml"))
-                    {
-                    OpenXml(fileContent);
-                }
-            }
-        }
 
         private void OpenXml(string fileContent)
         {
@@ -191,6 +168,30 @@ namespace RWO
         private void AdminForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Auth.Show();
+        }
+
+        private void ImportAdmin_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                Stream file = ofd.OpenFile();
+                string fileContent = null;
+                var srcEncoding = Encoding.GetEncoding(1251);
+                using (StreamReader reader = new StreamReader(file, encoding: srcEncoding))
+                {
+                    fileContent = reader.ReadToEnd();
+                }
+                if (fileContent != null && ofd.FileName.EndsWith("csv"))
+                {
+                    OpenCsv(fileContent);
+                }
+                else if (fileContent != null && ofd.FileName.EndsWith("xml"))
+                {
+                    OpenXml(fileContent);
+                }
+            }
         }
     }
 

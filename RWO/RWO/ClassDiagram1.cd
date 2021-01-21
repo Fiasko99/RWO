@@ -12,7 +12,6 @@
     <Members>
       <Method Name="AuthForm" Hidden="true" />
       <Method Name="AuthForm_Load" Hidden="true" />
-      <Method Name="AuthForm_Paint" Hidden="true" />
       <Field Name="BtnToRegistForm" Hidden="true" />
       <Field Name="capchaUpdates" Hidden="true" />
       <Field Name="CaptchaBox" Hidden="true" />
@@ -26,12 +25,10 @@
       <Field Name="listener" Hidden="true" />
       <Method Name="ListenPort" Hidden="true" />
       <Field Name="listenposttask" Hidden="true" />
-      <Method Name="LoginBox_TextChanged" Hidden="true" />
       <Field Name="LoginBtn" Hidden="true" />
       <Field Name="LoginLabel" Hidden="true" />
       <Method Name="MsgBoxError" Hidden="true" />
       <Method Name="MsgBoxWrong" Hidden="true" />
-      <Method Name="PassBox_TextChanged" Hidden="true" />
       <Field Name="PassLabel" Hidden="true" />
       <Field Name="RegForm" Hidden="true" />
       <Field Name="RememberLogin" Hidden="true" />
@@ -45,7 +42,7 @@
       <Field Name="WelcomeLabel" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AYCAEAAGACgAAAAIgASCBEACkI0AAAEosEBgIJAAYAo=</HashCode>
+      <HashCode>AYCAEAAGACgAAAAAgASCBAACkIwAAAEosEBgIJAAYAo=</HashCode>
       <FileName>AuthForm.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -130,7 +127,7 @@
       <Method Name="InitializeComponent" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAGAAAAAAAACAAAACgAAAAAAAAACAIBAAAAg=</HashCode>
+      <HashCode>AQAAAAAAAGAAAAAAAACAAAQCgAAAAAAAAAAAIBAAAAg=</HashCode>
       <FileName>AdminForm.cs</FileName>
     </TypeIdentifier>
   </Class>

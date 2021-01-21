@@ -81,7 +81,6 @@ namespace RWO
             this.LoginBox.Name = "LoginBox";
             this.LoginBox.Size = new System.Drawing.Size(555, 35);
             this.LoginBox.TabIndex = 7;
-            this.LoginBox.TextChanged += new System.EventHandler(this.LoginBox_TextChanged);
             // 
             // PassBox
             // 
@@ -90,7 +89,6 @@ namespace RWO
             this.PassBox.Size = new System.Drawing.Size(555, 35);
             this.PassBox.TabIndex = 8;
             this.PassBox.UseSystemPasswordChar = true;
-            this.PassBox.TextChanged += new System.EventHandler(this.PassBox_TextChanged);
             // 
             // RePassBtn
             // 
@@ -223,7 +221,6 @@ namespace RWO
             this.Name = "AuthForm";
             this.Text = "Auth";
             this.Load += new System.EventHandler(this.AuthForm_Load);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.AuthForm_Paint);
             ((System.ComponentModel.ISupportInitialize)(this.Captcha)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
