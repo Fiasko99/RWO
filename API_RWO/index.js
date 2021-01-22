@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('api/repass/:role/:login', async (req, res) => {
-
+  return res.end('Ссылка недействительна')
 })
 
 app.get('/admin/validate/import/:email/:login', async (req, res) => {
