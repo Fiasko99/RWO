@@ -87,7 +87,7 @@ namespace RWO
     }
     class DBConnection
     {
-        private readonly string URI = "http://176.100.0.104:3001";
+        private readonly string URI = "http://localhost:3001";
         // Все методы класса возвращают строку с ответом на запрос или null - если возникла ошибка при подключении
         // Поле для отладки, -2 - проблемы при подключении, -1 - ошибка доступа, 1 - запрос был выполнен успешно
         public string ExceptionMessage { get; private set; }
